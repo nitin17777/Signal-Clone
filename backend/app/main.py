@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.auth import router as auth_router
+# Primary auth router (per api-contract.md spec)
+from app.api.auth import router as auth_router
 
 app = FastAPI(
     title="Signal Clone API",
     version="1.0.0",
+    description="FastAPI backend for Signal Clone. Auth via httpOnly JWT cookie.",
 )
 
 # ---------------------------------------------------------------------------
