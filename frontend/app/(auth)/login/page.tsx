@@ -194,10 +194,13 @@ export default function LoginPage() {
             </div>
 
             <div className="p-3 rounded-panel bg-accent-blue/10 border border-accent-blue/30 text-xs text-blue-200">
-              💡 <span className="font-semibold">Dev Mode Hint:</span> Enter code{' '}
+              💡 <span className="font-semibold">Demo Verification Code:</span> Enter code{' '}
               <span className="font-mono font-bold bg-accent-blue/20 px-1.5 py-0.5 rounded text-white">
                 {devCodeHint || '123456'}
               </span>
+              <div className="text-[11px] text-text-secondary mt-1">
+                (Real SMS carrier gateway is not configured. Use demo OTP <strong>123456</strong> for any phone number.)
+              </div>
             </div>
 
             <Input
