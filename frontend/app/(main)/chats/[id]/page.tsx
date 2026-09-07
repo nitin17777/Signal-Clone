@@ -3,6 +3,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useSocket } from '@/context/SocketContext';
+import { signalWS } from '@/lib/ws';
+import type { WsMessageNew, WsTypingUpdate, WsMessageStatus } from '@/lib/ws';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
@@ -12,6 +15,7 @@ import { ConversationListItem } from '@/components/contacts/ConversationListItem
 import { ChatHeader } from '@/components/chat/ChatHeader';
 import { MessageBubble } from '@/components/chat/MessageBubble';
 import { Composer } from '@/components/chat/Composer';
+import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import {
   api,
   ConversationDetail,
@@ -24,6 +28,7 @@ export default function ChatDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { subscribe, send } = useSocket();
 
   const conversationId = useMemo(() => {
     const raw = params?.id;
@@ -39,6 +44,9 @@ export default function ChatDetailPage() {
   const [isSending, setIsSending] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
+  // typingUsers: user_id -> display name (for users currently typing in this conversation)
+  const [typingUsers, setTypingUsers] = useState<Map<number, string>>(new Map());
+  const typingTimersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch conversations list for sidebar
@@ -85,33 +93,121 @@ export default function ChatDetailPage() {
     fetchChatData();
   }, [fetchSidebarConversations, fetchChatData]);
 
+  // Derive sender name map early — needed by WS typing handler below
+  const senderNameMap = useMemo(() => {
+    const map: Record<number, string> = {};
+    if (conversationDetail?.members) {
+      for (const m of conversationDetail.members) {
+        if (m.user) {
+          map[m.user_id] = m.user.display_name || m.user.username || `User ${m.user_id}`;
+        }
+      }
+    }
+    return map;
+  }, [conversationDetail]);
+
+  // ------------------------------------------------------------------
+  // WebSocket: live message:new
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    const unsubNew = subscribe<WsMessageNew>('message:new', (ev) => {
+      if (ev.message.conversation_id !== conversationId) return;
+      setMessages((prev) => {
+        // Deduplicate by id (sender might have added it optimistically)
+        if (prev.some((m) => m.id === ev.message.id)) return prev;
+        return [...prev, ev.message as Message];
+      });
+      // Update sidebar last_message_at
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === conversationId
+            ? { ...c, last_message_preview: ev.message.content ?? '', last_message_at: ev.message.created_at }
+            : c
+        )
+      );
+    });
+
+    // WebSocket: message:status (update tick status on bubbles if needed)
+    const unsubStatus = subscribe<WsMessageStatus>('message:status', (_ev) => {
+      // No-op for now; MessageBubble status prop can be extended later
+    });
+
+    // WebSocket: typing:update
+    const unsubTyping = subscribe<WsTypingUpdate>('typing:update', (ev) => {
+      if (ev.conversation_id !== conversationId) return;
+      if (ev.user_id === user?.id) return; // skip own indicator
+
+      const name = senderNameMap[ev.user_id] ?? `User ${ev.user_id}`;
+
+      if (ev.is_typing) {
+        setTypingUsers((prev) => new Map(prev).set(ev.user_id, name));
+        // Auto-clear after 4 s (in case typing:stop is missed)
+        if (typingTimersRef.current.has(ev.user_id)) {
+          clearTimeout(typingTimersRef.current.get(ev.user_id)!);
+        }
+        typingTimersRef.current.set(
+          ev.user_id,
+          setTimeout(() => {
+            setTypingUsers((prev) => { const m = new Map(prev); m.delete(ev.user_id); return m; });
+          }, 4000)
+        );
+      } else {
+        if (typingTimersRef.current.has(ev.user_id)) {
+          clearTimeout(typingTimersRef.current.get(ev.user_id)!);
+          typingTimersRef.current.delete(ev.user_id);
+        }
+        setTypingUsers((prev) => { const m = new Map(prev); m.delete(ev.user_id); return m; });
+      }
+    });
+
+    return () => { unsubNew(); unsubStatus(); unsubTyping(); };
+  }, [subscribe, conversationId, user?.id, senderNameMap]);
+
   // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Handle sending new message via real API
+  // Handle sending: use WS when connected (message:new will update state),
+  // fall back to HTTP if WS is offline.
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isSending) return;
-    try {
-      setIsSending(true);
-      const newMsg = await api.sendMessage(conversationId, { content: text.trim() });
-      setMessages((prev) => [...prev, newMsg]);
-
-      // Update sidebar conversation preview
-      setConversations((prev) =>
-        prev.map((c) =>
-          c.id === conversationId
-            ? { ...c, last_message_preview: text.trim(), last_message_at: newMsg.created_at }
-            : c
-        )
-      );
-    } catch (err: any) {
-      console.error('Failed to send message:', err);
-      alert(err?.message || 'Failed to send message. Please try again.');
-    } finally {
-      setIsSending(false);
+    if (signalWS.isConnected) {
+      // WS path — message:new subscriber will append to state
+      send({
+        type: 'message:send',
+        conversation_id: conversationId,
+        content: text.trim(),
+        reply_to: null,
+      });
+    } else {
+      // HTTP fallback — add to state directly
+      try {
+        setIsSending(true);
+        const newMsg = await api.sendMessage(conversationId, { content: text.trim() });
+        setMessages((prev) => [...prev, newMsg]);
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === conversationId
+              ? { ...c, last_message_preview: text.trim(), last_message_at: newMsg.created_at }
+              : c
+          )
+        );
+      } catch (err: any) {
+        console.error('Failed to send message:', err);
+        alert(err?.message || 'Failed to send message. Please try again.');
+      } finally {
+        setIsSending(false);
+      }
     }
+  };
+
+  // Typing handler: relay to WS
+  const handleTypingChange = (isTyping: boolean) => {
+    send(isTyping
+      ? { type: 'typing:start', conversation_id: conversationId }
+      : { type: 'typing:stop', conversation_id: conversationId }
+    );
   };
 
   // Filter conversations for left sidebar
@@ -130,18 +226,7 @@ export default function ChatDetailPage() {
     [conversations]
   );
 
-  // Derive sender name map for group chats
-  const senderNameMap = useMemo(() => {
-    const map: Record<number, string> = {};
-    if (conversationDetail?.members) {
-      for (const m of conversationDetail.members) {
-        if (m.user) {
-          map[m.user_id] = m.user.display_name || m.user.username || `User ${m.user_id}`;
-        }
-      }
-    }
-    return map;
-  }, [conversationDetail]);
+  // senderNameMap already defined above the WS effect
 
   const chatTitle =
     conversationDetail?.name ||
@@ -346,10 +431,12 @@ export default function ChatDetailPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Composer wired to real handleSendMessage */}
+        {/* Composer wired to real handleSendMessage + typing */}
+        <TypingIndicator typingNames={Array.from(typingUsers.values())} />
         <Composer
           onSend={handleSendMessage}
-          disabled={loading || !!error || isSending}
+          onTypingChange={handleTypingChange}
+          disabled={loading || !!error}
           placeholder={`Message ${chatTitle}...`}
         />
       </main>

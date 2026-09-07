@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Cookie, WebSocket, WebSocketDisconnect
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -64,11 +64,18 @@ async def _authenticate(token: str | None) -> User | None:
 async def websocket_endpoint(
     websocket: WebSocket,
     token: str | None = None,
+    access_token: str | None = Cookie(default=None),
 ) -> None:
-    """Single persistent WS connection per logged-in user."""
+    """Single persistent WS connection per logged-in user.
 
-    # 1. Authenticate
-    user = await _authenticate(token)
+    Accepts authentication via:
+      - ?token=<jwt>  query param (for CLI/testing tools)
+      - access_token httpOnly cookie (for browser clients — sent automatically)
+    """
+
+    # 1. Authenticate — query param takes priority, cookie is the browser fallback
+    actual_token = token or access_token
+    user = await _authenticate(actual_token)
     if user is None:
         await websocket.close(code=4001)   # 4001 = Unauthorized (custom)
         return

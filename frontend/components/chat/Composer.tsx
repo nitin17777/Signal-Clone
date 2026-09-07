@@ -1,20 +1,42 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/Button';
 
 export interface ComposerProps {
   onSend: (content: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  /** Called with true when user starts typing, false when they stop (3 s inactivity) */
+  onTypingChange?: (isTyping: boolean) => void;
 }
 
 export const Composer: React.FC<ComposerProps> = ({
   onSend,
   placeholder = 'Send a message...',
   disabled = false,
+  onTypingChange,
 }) => {
   const [text, setText] = useState('');
+  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTypingRef = useRef(false);
+
+  const stopTyping = useCallback(() => {
+    if (isTypingRef.current) {
+      isTypingRef.current = false;
+      onTypingChange?.(false);
+    }
+  }, [onTypingChange]);
+
+  const handleTyping = useCallback(() => {
+    if (!isTypingRef.current) {
+      isTypingRef.current = true;
+      onTypingChange?.(true);
+    }
+    // Reset the 3 s inactivity timer
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+    typingTimerRef.current = setTimeout(stopTyping, 3000);
+  }, [onTypingChange, stopTyping]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize textarea as text expands
@@ -31,6 +53,9 @@ export const Composer: React.FC<ComposerProps> = ({
   const handleSend = () => {
     const trimmed = text.trim();
     if (!trimmed || disabled) return;
+    // Stop typing indicator immediately on send
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+    stopTyping();
     onSend(trimmed);
     setText('');
     if (textareaRef.current) {
@@ -77,7 +102,7 @@ export const Composer: React.FC<ComposerProps> = ({
             ref={textareaRef}
             rows={1}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => { setText(e.target.value); if (e.target.value.trim()) handleTyping(); else stopTyping(); }}
             onKeyDown={handleKeyDown}
             disabled={disabled}
             placeholder={placeholder}
