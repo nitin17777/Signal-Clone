@@ -65,7 +65,9 @@ async def _require_admin(
 async def _get_conversation_or_404(db: AsyncSession, conversation_id: int) -> Conversation:
     result = await db.execute(
         select(Conversation)
-        .options(selectinload(Conversation.members))
+        .options(
+            selectinload(Conversation.members).selectinload(ConversationMember.user)
+        )
         .where(Conversation.id == conversation_id)
     )
     conv = result.scalar_one_or_none()
@@ -267,7 +269,15 @@ async def get_conversation_detail(
 ) -> ConversationDetail:
     await _require_member(db, conversation_id, current_user_id)
     conv = await _get_conversation_or_404(db, conversation_id)
-    return ConversationDetail.model_validate(conv)
+    detail = ConversationDetail.model_validate(conv)
+    if conv.type == "direct":
+        other = next((m for m in conv.members if m.user_id != current_user_id), None)
+        if other and other.user:
+            detail.name = other.user.display_name or other.user.username
+            detail.avatar_url = other.user.avatar_url or detail.avatar_url
+        if not detail.name:
+            detail.name = "Direct Message"
+    return detail
 
 
 async def update_conversation(
