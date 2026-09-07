@@ -50,18 +50,26 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone_number: phoneNumber.trim() }),
       });
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Non-JSON response
+      }
 
       if (!res.ok) {
-        throw new Error(data.detail || 'Failed to request OTP');
+        throw new Error(data.detail || `Request failed (${res.status})`);
       }
 
       setDevCodeHint(data.dev_only_code || '123456');
       setStep('verify');
       setToastMsg({ message: 'Verification code sent!', type: 'success' });
     } catch (err: any) {
-      setError(err.message || 'Error sending OTP');
-      setToastMsg({ message: err.message || 'Error sending OTP', type: 'error' });
+      const msg = err.message === 'Failed to fetch'
+        ? 'Cannot connect to backend server. The backend might still be deploying or waking up on Render. Please wait 30 seconds and try again.'
+        : (err.message || 'Error sending OTP');
+      setError(msg);
+      setToastMsg({ message: msg, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -87,17 +95,25 @@ export default function LoginPage() {
           code: otpCode.trim(),
         }),
       });
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Non-JSON response
+      }
 
       if (!res.ok) {
-        throw new Error(data.detail || 'Verification failed');
+        throw new Error(data.detail || `Verification failed (${res.status})`);
       }
 
       await checkAuth();
       router.push('/chats');
     } catch (err: any) {
-      setError(err.message || 'Invalid code or user not found');
-      setToastMsg({ message: err.message || 'Invalid code or user not found', type: 'error' });
+      const msg = err.message === 'Failed to fetch'
+        ? 'Cannot connect to backend server. Please verify backend URL and CORS settings.'
+        : (err.message || 'Invalid code or user not found');
+      setError(msg);
+      setToastMsg({ message: msg, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -125,17 +141,25 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Non-JSON response
+      }
 
       if (!res.ok) {
-        throw new Error(data.detail || 'Login failed');
+        throw new Error(data.detail || `Login failed (${res.status})`);
       }
 
       await checkAuth();
       router.push('/chats');
     } catch (err: any) {
-      setError(err.message || 'Invalid credentials');
-      setToastMsg({ message: err.message || 'Invalid credentials', type: 'error' });
+      const msg = err.message === 'Failed to fetch'
+        ? 'Cannot connect to backend server. Please verify backend URL and CORS settings.'
+        : (err.message || 'Invalid credentials');
+      setError(msg);
+      setToastMsg({ message: msg, type: 'error' });
     } finally {
       setLoading(false);
     }

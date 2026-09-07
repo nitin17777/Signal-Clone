@@ -56,18 +56,26 @@ export default function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone_number: phoneNumber.trim() }),
       });
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Non-JSON response
+      }
 
       if (!res.ok) {
-        throw new Error(data.detail || 'Failed to request OTP');
+        throw new Error(data.detail || `Request failed (${res.status})`);
       }
 
       setDevCodeHint(data.dev_only_code || '123456');
       setStep('verify');
       setToastMsg({ message: 'Verification code sent!', type: 'success' });
     } catch (err: any) {
-      setError(err.message || 'Error requesting verification code');
-      setToastMsg({ message: err.message || 'Error requesting verification code', type: 'error' });
+      const msg = err.message === 'Failed to fetch'
+        ? 'Cannot connect to backend server. The backend might still be deploying or waking up on Render. Please wait 30 seconds and try again.'
+        : (err.message || 'Error requesting verification code');
+      setError(msg);
+      setToastMsg({ message: msg, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -98,17 +106,25 @@ export default function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Non-JSON response
+      }
 
       if (!res.ok) {
-        throw new Error(data.detail || 'Registration failed');
+        throw new Error(data.detail || `Registration failed (${res.status})`);
       }
 
       await checkAuth();
       router.push('/chats');
     } catch (err: any) {
-      setError(err.message || 'Registration failed');
-      setToastMsg({ message: err.message || 'Registration failed', type: 'error' });
+      const msg = err.message === 'Failed to fetch'
+        ? 'Cannot connect to backend server. Please verify backend URL and CORS settings.'
+        : (err.message || 'Registration failed');
+      setError(msg);
+      setToastMsg({ message: msg, type: 'error' });
     } finally {
       setLoading(false);
     }
