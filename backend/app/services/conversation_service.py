@@ -254,10 +254,12 @@ async def create_group(
     db.add_all(members)
     await db.commit()
 
-    # Reload with members
+    # Reload with members and users
     result = await db.execute(
         select(Conversation)
-        .options(selectinload(Conversation.members))
+        .options(
+            selectinload(Conversation.members).selectinload(ConversationMember.user)
+        )
         .where(Conversation.id == conv.id)
     )
     conv = result.scalar_one()
@@ -363,6 +365,19 @@ async def remove_member(
     member = result.scalar_one_or_none()
     if member is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Member not found.")
+
+    if target_user_id == current_user_id:
+        admin_count_res = await db.execute(
+            select(func.count(ConversationMember.id)).where(
+                ConversationMember.conversation_id == conversation_id,
+                ConversationMember.role == "admin",
+            )
+        )
+        if admin_count_res.scalar_one() <= 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot remove yourself as the only admin.",
+            )
 
     await db.delete(member)
     await db.commit()

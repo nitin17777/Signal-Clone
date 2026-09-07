@@ -18,6 +18,7 @@ from app.db.session import get_db
 from app.models.user import User
 from app.schemas.message import MessageCreate, MessageRead
 from app.services import message_service
+from app.ws.manager import manager
 
 router = APIRouter(tags=["messages"])
 
@@ -57,7 +58,19 @@ async def send_message(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> MessageRead:
-    return await message_service.send_message(db, current_user.id, conversation_id, body)
+    msg = await message_service.send_message(db, current_user.id, conversation_id, body)
+    payload = {
+        "type": "message:new",
+        "message": msg.model_dump(mode="json"),
+        "conversation_id": conversation_id,
+    }
+    await manager.broadcast_to_conversation(
+        db=db,
+        conversation_id=conversation_id,
+        payload=payload,
+        exclude_user_id=None,
+    )
+    return msg
 
 
 # ---------------------------------------------------------------------------

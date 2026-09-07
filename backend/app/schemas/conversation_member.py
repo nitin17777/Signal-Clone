@@ -5,6 +5,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
+from app.schemas.user import UserPublic
+
 
 # ---------------------------------------------------------------------------
 # Read — single membership row
@@ -19,6 +21,7 @@ class ConversationMemberRead(BaseModel):
     joined_at: datetime
     last_read_message_id: int | None
     is_muted: bool
+    user: UserPublic | None = None
 
 
 # ---------------------------------------------------------------------------

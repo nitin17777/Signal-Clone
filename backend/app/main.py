@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.conversations import router as conversations_router
 from app.api.messages import router as messages_router
+from app.api.users import router as users_router
 from app.ws.router import router as ws_router
 
 app = FastAPI(
@@ -32,6 +33,7 @@ app.add_middleware(
 # Routers
 # ---------------------------------------------------------------------------
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(users_router, prefix="/api/v1")
 app.include_router(conversations_router, prefix="/api/v1")
 app.include_router(messages_router, prefix="/api/v1")
 app.include_router(ws_router)  # WS /ws?token=<jwt>  (no prefix)

@@ -12,10 +12,12 @@ import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { ConversationListItem } from '@/components/contacts/ConversationListItem';
+import { NewGroupModal } from '@/components/contacts/NewGroupModal';
 import { ChatHeader } from '@/components/chat/ChatHeader';
 import { MessageBubble } from '@/components/chat/MessageBubble';
 import { Composer } from '@/components/chat/Composer';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
+import { GroupInfoPanel } from '@/components/chat/GroupInfoPanel';
 import {
   api,
   ConversationDetail,
@@ -44,6 +46,8 @@ export default function ChatDetailPage() {
   const [isSending, setIsSending] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
+  const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
+  const [isGroupInfoOpen, setIsGroupInfoOpen] = useState(false);
   // typingUsers: user_id -> display name (for users currently typing in this conversation)
   const [typingUsers, setTypingUsers] = useState<Map<number, string>>(new Map());
   const typingTimersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
@@ -255,8 +259,31 @@ export default function ChatDetailPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1 shrink-0">
             <button
+              id="new-group-modal-btn"
+              onClick={() => setIsNewGroupModalOpen(true)}
+              title="New Group"
+              className="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-panel transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </button>
+            <button
+              id="new-chat-modal-btn"
               onClick={() => setIsNewChatModalOpen(true)}
               title="New Conversation"
               className="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-panel transition-colors"
@@ -350,95 +377,114 @@ export default function ChatDetailPage() {
       </aside>
 
       {/* ---------------- Right Chat Pane ---------------- */}
-      <main className="flex-1 flex flex-col h-full bg-[#18191C] overflow-hidden">
-        {/* Chat Header */}
-        <ChatHeader
-          name={chatTitle}
-          avatarUrl={conversationDetail?.avatar_url}
-          isOnline={conversationDetail?.type === 'direct'}
-          type={conversationDetail?.type}
-          onBack={() => router.push('/chats')}
-        />
+      <main className="flex-1 flex flex-row h-full overflow-hidden">
+        <div className="flex-1 flex flex-col h-full bg-[#18191C] overflow-hidden">
+          {/* Chat Header */}
+          <ChatHeader
+            name={chatTitle}
+            avatarUrl={conversationDetail?.avatar_url}
+            isOnline={conversationDetail?.type === 'direct'}
+            type={conversationDetail?.type}
+            memberCount={conversationDetail?.members?.length}
+            onBack={() => router.push('/chats')}
+            onInfoClick={() => setIsGroupInfoOpen((prev) => !prev)}
+          />
 
-        {/* Messages Body */}
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col justify-start space-y-1">
-          {/* E2EE Info Banner */}
-          <div className="mx-auto max-w-sm text-center py-2 px-4 rounded-panel bg-bg-panel/40 border border-neutral-800/60 text-xs text-text-secondary leading-relaxed mb-4 select-none">
-            🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not even
-            Signal, can read or listen to them.
+          {/* Messages Body */}
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col justify-start space-y-1">
+            {/* E2EE Info Banner */}
+            <div className="mx-auto max-w-sm text-center py-2 px-4 rounded-panel bg-bg-panel/40 border border-neutral-800/60 text-xs text-text-secondary leading-relaxed mb-4 select-none">
+              🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not even
+              Signal, can read or listen to them.
+            </div>
+
+            {/* Loading Skeletons */}
+            {loading && (
+              <div className="space-y-3 py-4 animate-pulse">
+                <div className="flex justify-start">
+                  <div className="h-10 w-48 rounded-bubble bg-bg-panel/50" />
+                </div>
+                <div className="flex justify-end">
+                  <div className="h-10 w-56 rounded-bubble bg-accent-blue/30" />
+                </div>
+                <div className="flex justify-start">
+                  <div className="h-12 w-64 rounded-bubble bg-bg-panel/50" />
+                </div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && !loading && (
+              <div className="m-auto max-w-sm p-4 rounded-panel bg-red-500/10 border border-red-500/30 text-center">
+                <p className="text-xs text-red-400 mb-2 leading-relaxed">{error}</p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={fetchChatData}
+                  className="text-xs py-1 px-3"
+                >
+                  Retry
+                </Button>
+              </div>
+            )}
+
+            {/* Empty Conversation State */}
+            {!loading && !error && messages.length === 0 && (
+              <div className="my-auto text-center py-8 text-text-secondary text-xs">
+                No messages yet. Send a message to start the conversation!
+              </div>
+            )}
+
+            {/* Render Real Message Bubbles */}
+            {!loading &&
+              !error &&
+              messages.map((msg) => {
+                const isSentByMe = msg.sender_id === (user?.id || 1);
+                const senderDisplayName =
+                  !isSentByMe && conversationDetail?.type === 'group'
+                    ? senderNameMap[msg.sender_id] || `User ${msg.sender_id}`
+                    : undefined;
+
+                return (
+                  <MessageBubble
+                    key={msg.id}
+                    id={msg.id}
+                    content={msg.content}
+                    timestamp={msg.created_at}
+                    isSent={isSentByMe}
+                    status="delivered"
+                    senderName={senderDisplayName}
+                    isDeleted={msg.is_deleted}
+                  />
+                );
+              })}
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* Loading Skeletons */}
-          {loading && (
-            <div className="space-y-3 py-4 animate-pulse">
-              <div className="flex justify-start">
-                <div className="h-10 w-48 rounded-bubble bg-bg-panel/50" />
-              </div>
-              <div className="flex justify-end">
-                <div className="h-10 w-56 rounded-bubble bg-accent-blue/30" />
-              </div>
-              <div className="flex justify-start">
-                <div className="h-12 w-64 rounded-bubble bg-bg-panel/50" />
-              </div>
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && !loading && (
-            <div className="m-auto max-w-sm p-4 rounded-panel bg-red-500/10 border border-red-500/30 text-center">
-              <p className="text-xs text-red-400 mb-2 leading-relaxed">{error}</p>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={fetchChatData}
-                className="text-xs py-1 px-3"
-              >
-                Retry
-              </Button>
-            </div>
-          )}
-
-          {/* Empty Conversation State */}
-          {!loading && !error && messages.length === 0 && (
-            <div className="my-auto text-center py-8 text-text-secondary text-xs">
-              No messages yet. Send a message to start the conversation!
-            </div>
-          )}
-
-          {/* Render Real Message Bubbles */}
-          {!loading &&
-            !error &&
-            messages.map((msg) => {
-              const isSentByMe = msg.sender_id === (user?.id || 1);
-              const senderDisplayName =
-                !isSentByMe && conversationDetail?.type === 'group'
-                  ? senderNameMap[msg.sender_id] || `User ${msg.sender_id}`
-                  : undefined;
-
-              return (
-                <MessageBubble
-                  key={msg.id}
-                  id={msg.id}
-                  content={msg.content}
-                  timestamp={msg.created_at}
-                  isSent={isSentByMe}
-                  status="delivered"
-                  senderName={senderDisplayName}
-                  isDeleted={msg.is_deleted}
-                />
-              );
-            })}
-          <div ref={messagesEndRef} />
+          {/* Composer wired to real handleSendMessage + typing */}
+          <TypingIndicator typingNames={Array.from(typingUsers.values())} />
+          <Composer
+            onSend={handleSendMessage}
+            onTypingChange={handleTypingChange}
+            disabled={loading || !!error}
+            placeholder={`Message ${chatTitle}...`}
+          />
         </div>
 
-        {/* Composer wired to real handleSendMessage + typing */}
-        <TypingIndicator typingNames={Array.from(typingUsers.values())} />
-        <Composer
-          onSend={handleSendMessage}
-          onTypingChange={handleTypingChange}
-          disabled={loading || !!error}
-          placeholder={`Message ${chatTitle}...`}
-        />
+        {/* Group Info Panel */}
+        {conversationDetail?.type === 'group' && isGroupInfoOpen && (
+          <GroupInfoPanel
+            conversation={conversationDetail}
+            currentUserId={user?.id || 0}
+            currentUserRole={
+              (conversationDetail.members.find((m) => m.user_id === user?.id)?.role as
+                | 'admin'
+                | 'member') || 'member'
+            }
+            onClose={() => setIsGroupInfoOpen(false)}
+            onMemberRemoved={fetchChatData}
+          />
+        )}
       </main>
 
       {/* New Chat Modal */}
@@ -467,6 +513,13 @@ export default function ChatDetailPage() {
           </div>
         </div>
       </Modal>
+
+      {/* New Group Modal */}
+      <NewGroupModal
+        isOpen={isNewGroupModalOpen}
+        onClose={() => setIsNewGroupModalOpen(false)}
+        onGroupCreated={() => fetchSidebarConversations()}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
@@ -8,10 +9,12 @@ import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { ConversationListItem } from '@/components/contacts/ConversationListItem';
+import { NewGroupModal } from '@/components/contacts/NewGroupModal';
 import { api, ConversationListItem as ApiConversation } from '@/lib/api';
 import { MockConversation } from '@/lib/mock-data';
 
 export default function ChatsPage() {
+  const router = useRouter();
   const { user, logout } = useAuth();
   const [conversations, setConversations] = useState<ApiConversation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -19,6 +22,7 @@ export default function ChatsPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
+  const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
 
   // Fetch conversations from the real backend API
   const fetchConversations = useCallback(async () => {
@@ -100,8 +104,31 @@ export default function ChatsPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1 shrink-0">
             <button
+              id="new-group-modal-btn"
+              onClick={() => setIsNewGroupModalOpen(true)}
+              title="New Group"
+              className="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-panel transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </button>
+            <button
+              id="new-chat-modal-btn"
               onClick={() => setIsNewChatModalOpen(true)}
               title="New Conversation"
               className="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-panel transition-colors"
@@ -252,7 +279,7 @@ export default function ChatsPage() {
                   key={conv.id}
                   conversation={itemData}
                   isSelected={conv.id === selectedId}
-                  onClick={() => setSelectedId(conv.id)}
+                  onClick={() => router.push(`/chats/${conv.id}`)}
                 />
               );
             })}
@@ -422,6 +449,13 @@ export default function ChatsPage() {
           </div>
         </div>
       </Modal>
+
+      {/* New Group Modal */}
+      <NewGroupModal
+        isOpen={isNewGroupModalOpen}
+        onClose={() => setIsNewGroupModalOpen(false)}
+        onGroupCreated={() => fetchConversations()}
+      />
     </div>
   );
 }

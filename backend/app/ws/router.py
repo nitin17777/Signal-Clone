@@ -133,6 +133,7 @@ async def websocket_endpoint(
                     # Broadcast message:new to ALL members (incl. sender)
                     payload = {
                         "type": "message:new",
+                        "conversation_id": conversation_id,
                         "message": msg_read.model_dump(mode="json"),
                     }
                     await manager.broadcast_to_conversation(
