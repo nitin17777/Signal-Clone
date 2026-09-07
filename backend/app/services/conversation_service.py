@@ -94,7 +94,9 @@ async def list_conversations(
 
     result = await db.execute(
         select(Conversation)
-        .options(selectinload(Conversation.members))
+        .options(
+            selectinload(Conversation.members).selectinload(ConversationMember.user)
+        )
         .where(Conversation.id.in_(membership_sq))
         .order_by(Conversation.last_message_at.desc().nullslast())
     )
@@ -107,6 +109,19 @@ async def list_conversations(
             (m for m in conv.members if m.user_id == current_user_id), None
         )
         last_read_id = my_member.last_read_message_id if my_member else None
+
+        # Determine display name and avatar for direct chats vs groups
+        display_name = conv.name
+        avatar_url = conv.avatar_url
+        if conv.type == "direct":
+            other_member = next(
+                (m for m in conv.members if m.user_id != current_user_id), None
+            )
+            if other_member and other_member.user:
+                display_name = other_member.user.display_name or other_member.user.username
+                avatar_url = other_member.user.avatar_url or avatar_url
+            if not display_name:
+                display_name = "Direct Message"
 
         # Unread count = incoming messages after last_read_message_id
         unread_q = select(func.count(Message.id)).where(
@@ -125,7 +140,7 @@ async def list_conversations(
                 Message.conversation_id == conv.id,
                 Message.is_deleted == False,  # noqa: E712
             )
-            .order_by(Message.created_at.desc())
+            .order_by(Message.id.desc())
             .limit(1)
         )
         last_preview = last_msg_result.scalar_one_or_none()
@@ -134,8 +149,8 @@ async def list_conversations(
             ConversationListItem(
                 id=conv.id,
                 type=conv.type,
-                name=conv.name,
-                avatar_url=conv.avatar_url,
+                name=display_name,
+                avatar_url=avatar_url,
                 created_by=conv.created_by,
                 created_at=conv.created_at,
                 last_message_at=conv.last_message_at,

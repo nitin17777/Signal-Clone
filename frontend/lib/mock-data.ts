@@ -10,7 +10,7 @@ export interface MockConversation {
   avatar_url: string | null;
   created_by: number | null;
   created_at: string;
-  last_message_at: string;
+  last_message_at: string | null;
   unread_count: number;
   last_message_preview: string | null;
   is_online?: boolean;

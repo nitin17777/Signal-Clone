@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
@@ -8,14 +8,38 @@ import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { ConversationListItem } from '@/components/contacts/ConversationListItem';
-import { MOCK_CONVERSATIONS, MockConversation } from '@/lib/mock-data';
+import { api, ConversationListItem as ApiConversation } from '@/lib/api';
+import { MockConversation } from '@/lib/mock-data';
 
 export default function ChatsPage() {
   const { user, logout } = useAuth();
-  const [conversations] = useState<MockConversation[]>(MOCK_CONVERSATIONS);
-  const [selectedId, setSelectedId] = useState<number | null>(MOCK_CONVERSATIONS[0]?.id ?? null);
+  const [conversations, setConversations] = useState<ApiConversation[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
+
+  // Fetch conversations from the real backend API
+  const fetchConversations = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await api.getConversations();
+      setConversations(data);
+      // Automatically select the first conversation if none selected
+      setSelectedId((prev) => (prev !== null ? prev : data[0]?.id ?? null));
+    } catch (err: any) {
+      console.error('Failed to fetch conversations:', err);
+      setError(err?.message || 'Failed to load conversations. Please check your connection.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchConversations();
+  }, [fetchConversations]);
 
   // Sort conversations by most recent (last_message_at descending)
   const sortedConversations = useMemo(() => {
@@ -32,7 +56,7 @@ export default function ChatsPage() {
     const query = searchQuery.toLowerCase();
     return sortedConversations.filter(
       (c) =>
-        c.name.toLowerCase().includes(query) ||
+        (c.name && c.name.toLowerCase().includes(query)) ||
         (c.last_message_preview && c.last_message_preview.toLowerCase().includes(query))
     );
   }, [sortedConversations, searchQuery]);
@@ -132,9 +156,33 @@ export default function ChatsPage() {
 
         {/* Conversation List Header */}
         <div className="flex items-center justify-between px-4 pt-3 pb-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-            Chats
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              Chats
+            </span>
+            <button
+              onClick={fetchConversations}
+              title="Refresh conversations"
+              disabled={loading}
+              className="text-text-secondary hover:text-text-primary transition-colors p-0.5"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`}
+              >
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                <path d="M16 21h5v-5" />
+              </svg>
+            </button>
+          </div>
           {totalUnread > 0 && (
             <Badge variant="unread" count={totalUnread}>
               {totalUnread} unread
@@ -142,22 +190,72 @@ export default function ChatsPage() {
           )}
         </div>
 
-        {/* Scrollable List */}
+        {/* Scrollable List with Loading, Error, and Empty states */}
         <div className="flex-1 overflow-y-auto px-2 py-1 space-y-1">
-          {filteredConversations.length === 0 ? (
-            <div className="py-12 text-center text-text-secondary text-xs">
-              No conversations found.
+          {/* Loading State: Skeletons */}
+          {loading && conversations.length === 0 && (
+            <div className="space-y-2 p-2 animate-pulse">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-panel bg-bg-panel/40">
+                  <div className="w-10 h-10 rounded-full bg-neutral-700/50 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3.5 bg-neutral-700/60 rounded w-28" />
+                    <div className="h-2.5 bg-neutral-700/40 rounded w-44" />
+                  </div>
+                </div>
+              ))}
             </div>
-          ) : (
-            filteredConversations.map((conv) => (
-              <ConversationListItem
-                key={conv.id}
-                conversation={conv}
-                isSelected={conv.id === selectedId}
-                onClick={() => setSelectedId(conv.id)}
-              />
-            ))
           )}
+
+          {/* Error State */}
+          {error && (
+            <div className="m-3 p-3.5 rounded-panel bg-red-500/10 border border-red-500/30 text-center">
+              <p className="text-xs text-red-400 mb-2 leading-relaxed">{error}</p>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={fetchConversations}
+                className="text-xs py-1 px-3"
+              >
+                Retry
+              </Button>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && filteredConversations.length === 0 && (
+            <div className="py-12 text-center text-text-secondary text-xs px-4">
+              {searchQuery ? 'No matching conversations found.' : 'No conversations yet. Start a new chat to begin messaging!'}
+            </div>
+          )}
+
+          {/* Conversation List */}
+          {!loading &&
+            !error &&
+            filteredConversations.map((conv) => {
+              // Pass shape to ConversationListItem without modifying its internal logic
+              const itemData: MockConversation = {
+                id: conv.id,
+                type: conv.type,
+                name: conv.name || (conv.type === 'direct' ? 'Direct Message' : 'Group'),
+                avatar_url: conv.avatar_url,
+                created_by: conv.created_by,
+                created_at: conv.created_at,
+                last_message_at: conv.last_message_at,
+                unread_count: conv.unread_count,
+                last_message_preview: conv.last_message_preview,
+                is_online: conv.is_online,
+              };
+
+              return (
+                <ConversationListItem
+                  key={conv.id}
+                  conversation={itemData}
+                  isSelected={conv.id === selectedId}
+                  onClick={() => setSelectedId(conv.id)}
+                />
+              );
+            })}
         </div>
       </aside>
 
@@ -193,14 +291,14 @@ export default function ChatsPage() {
                 </button>
 
                 <Avatar
-                  name={selectedConversation.name}
+                  name={selectedConversation.name || (selectedConversation.type === 'direct' ? 'Direct Message' : 'Group')}
                   src={selectedConversation.avatar_url}
                   size="md"
                   isOnline={selectedConversation.is_online}
                 />
                 <div className="min-w-0">
                   <h2 className="text-sm font-semibold text-text-primary truncate">
-                    {selectedConversation.name}
+                    {selectedConversation.name || (selectedConversation.type === 'direct' ? 'Direct Message' : 'Group')}
                   </h2>
                   <p className="text-xs text-text-secondary">
                     {selectedConversation.type === 'group'
@@ -243,12 +341,14 @@ export default function ChatsPage() {
                 <div className="flex justify-start">
                   <div className="max-w-[75%] rounded-bubble bg-bubble-received px-4 py-2.5 text-sm text-text-primary shadow-sm">
                     <p>{selectedConversation.last_message_preview}</p>
-                    <span className="text-[10px] text-text-secondary block text-right mt-1">
-                      {new Date(selectedConversation.last_message_at).toLocaleTimeString([], {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })}
-                    </span>
+                    {selectedConversation.last_message_at && (
+                      <span className="text-[10px] text-text-secondary block text-right mt-1">
+                        {new Date(selectedConversation.last_message_at).toLocaleTimeString([], {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
@@ -259,7 +359,7 @@ export default function ChatsPage() {
               <div className="flex items-center gap-2">
                 <Input
                   disabled
-                  placeholder={`Message ${selectedConversation.name}... (messaging active in next phase)`}
+                  placeholder={`Message ${selectedConversation.name || 'chat'}... (messaging active in next phase)`}
                   className="bg-bg-panel/60 text-sm cursor-not-allowed opacity-75"
                 />
                 <Button disabled size="md" className="opacity-60 cursor-not-allowed">
