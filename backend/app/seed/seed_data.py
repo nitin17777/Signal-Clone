@@ -10,6 +10,9 @@ Seeds:
   mixed sent/delivered/read statuses
 - 2 group conversations with 4-5 members each, one admin per group
 - At least one unread conversation per demo user
+
+NOTE: This script runs `alembic upgrade head` automatically before seeding,
+so it is safe to call on a freshly-provisioned database.
 """
 
 import asyncio
@@ -414,16 +417,43 @@ async def create_group_conversation(
 # Main seed function
 # ---------------------------------------------------------------------------
 
+def run_migrations() -> None:
+    """Apply all pending Alembic migrations before seeding."""
+    import subprocess  # noqa: PLC0415
+    import os
+
+    # Resolve the backend root (two levels up from this file)
+    backend_root = str(Path(__file__).resolve().parents[2])
+    env = {**os.environ, "PYTHONPATH": backend_root}
+
+    print("Running: alembic upgrade head ...")
+    result = subprocess.run(
+        [sys.executable, "-m", "alembic", "upgrade", "head"],
+        cwd=backend_root,
+        env=env,
+        capture_output=False,
+    )
+    if result.returncode != 0:
+        print("[ERROR] alembic upgrade head failed — aborting seed.", file=sys.stderr)
+        sys.exit(result.returncode)
+    print("[OK] Migrations applied.")
+
+
 async def seed() -> None:
     async with AsyncSessionLocal() as session:
         # ---- Wipe existing seed data cleanly ----
         print("Clearing existing data...")
-        await session.execute(delete(MessageStatus))
-        await session.execute(delete(Message))
-        await session.execute(delete(ConversationMember))
-        await session.execute(delete(Conversation))
-        await session.execute(delete(User))
-        await session.commit()
+        try:
+            await session.execute(delete(MessageStatus))
+            await session.execute(delete(Message))
+            await session.execute(delete(ConversationMember))
+            await session.execute(delete(Conversation))
+            await session.execute(delete(User))
+            await session.commit()
+        except Exception as exc:  # noqa: BLE001
+            # On a fresh DB some tables may not exist yet; that is fine.
+            print(f"[WARN] Could not wipe tables (fresh DB?): {exc}")
+            await session.rollback()
 
         # ---- Create users ----
         print("Creating users...")
@@ -492,4 +522,5 @@ async def seed() -> None:
 
 
 if __name__ == "__main__":
+    run_migrations()
     asyncio.run(seed())
