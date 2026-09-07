@@ -4,8 +4,14 @@
  * Automatically sends credentials: 'include' for httpOnly cookie authentication.
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-const BASE_PATH = `${API_BASE_URL}/api/v1`;
+export function getApiBaseUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  return raw.trim().replace(/\/+$/, '').replace(/\/api\/v1\/?$/, '');
+}
+
+export const API_BASE_URL = getApiBaseUrl();
+export const BASE_PATH = `${API_BASE_URL}/api/v1`;
+
 
 export class ApiError extends Error {
   status: number;

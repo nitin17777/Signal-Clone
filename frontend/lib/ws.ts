@@ -8,7 +8,14 @@
  *  - Graceful disconnect (no reconnect on intentional close)
  */
 
-const WS_URL = (process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000') + '/ws';
+export function getWsUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+  const clean = raw.trim().replace(/\/+$/, '').replace(/\/ws\/?$/, '');
+  return `${clean}/ws`;
+}
+
+const WS_URL = getWsUrl();
+
 
 // ---------------------------------------------------------------------------
 // Types mirroring ws-contract.md
