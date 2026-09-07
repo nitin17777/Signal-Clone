@@ -77,12 +77,10 @@ async def register(
 )
 async def request_otp_route(body: RequestOtpBody) -> dict:
     code = request_otp(body.phone_number)
-    # In production: fire SMS here, never return the code.
-    # In dev we echo it so clients can test without a real SMS service.
-    return {
-        "detail": "OTP sent.",
-        "dev_only_code": code,  # REMOVE in production
-    }
+    res: dict[str, str] = {"detail": "OTP sent."}
+    if settings.ENVIRONMENT.lower() != "production":
+        res["dev_only_code"] = code
+    return res
 
 
 # ---------------------------------------------------------------------------
