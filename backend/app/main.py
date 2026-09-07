@@ -77,8 +77,19 @@ app.include_router(ws_router)  # WS /ws?token=<jwt>  (no prefix)
 
 
 # ---------------------------------------------------------------------------
-# Health
+# Health & Root
 # ---------------------------------------------------------------------------
+@app.get("/", tags=["root"])
+async def root():
+    return {
+        "status": "online",
+        "message": "Signal Clone Backend API is running successfully!",
+        "docs": "/docs",
+        "health": "/health",
+    }
+
+
 @app.get("/health", tags=["health"])
 async def health_check():
     return {"status": "ok"}
+
