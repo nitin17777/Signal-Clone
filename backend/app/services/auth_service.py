@@ -39,13 +39,16 @@ MOCK_OTP = "123456"
 # Cookie helper
 # ---------------------------------------------------------------------------
 def set_auth_cookie(response: Response, token: str) -> None:
-    """Write the JWT into an httpOnly samesite=lax cookie."""
+    """Write the JWT into an httpOnly cookie."""
+    is_prod = settings.ENVIRONMENT.lower() == "production"
+    is_secure = settings.COOKIE_SECURE if settings.COOKIE_SECURE is not None else is_prod
+    samesite_val = settings.COOKIE_SAMESITE if settings.COOKIE_SAMESITE is not None else ("none" if is_prod else "lax")
     response.set_cookie(
         key=COOKIE_NAME,
         value=token,
         httponly=True,
-        secure=False,      # flip to True in production (HTTPS)
-        samesite="lax",
+        secure=is_secure,
+        samesite=samesite_val,
         max_age=COOKIE_MAX_AGE,
         path="/",
     )
@@ -53,7 +56,15 @@ def set_auth_cookie(response: Response, token: str) -> None:
 
 def clear_auth_cookie(response: Response) -> None:
     """Delete the auth cookie."""
-    response.delete_cookie(key=COOKIE_NAME, path="/")
+    is_prod = settings.ENVIRONMENT.lower() == "production"
+    is_secure = settings.COOKIE_SECURE if settings.COOKIE_SECURE is not None else is_prod
+    samesite_val = settings.COOKIE_SAMESITE if settings.COOKIE_SAMESITE is not None else ("none" if is_prod else "lax")
+    response.delete_cookie(
+        key=COOKIE_NAME,
+        path="/",
+        secure=is_secure,
+        samesite=samesite_val,
+    )
 
 
 # ---------------------------------------------------------------------------

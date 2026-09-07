@@ -13,17 +13,17 @@ app = FastAPI(
     description="FastAPI backend for Signal Clone. Auth via httpOnly JWT cookie.",
 )
 
+from app.core.config import settings
+
 # ---------------------------------------------------------------------------
 # CORS
 # ---------------------------------------------------------------------------
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https:\/\/.*\.vercel\.app" if settings.ENVIRONMENT.lower() == "production" else None,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
