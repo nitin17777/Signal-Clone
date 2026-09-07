@@ -1,17 +1,20 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useSocket } from '@/context/SocketContext';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
+import { Toast } from '@/components/ui/Toast';
 import { ConversationListItem } from '@/components/contacts/ConversationListItem';
 import { NewGroupModal } from '@/components/contacts/NewGroupModal';
 import { api, ConversationListItem as ApiConversation } from '@/lib/api';
 import { MockConversation } from '@/lib/mock-data';
+import type { WsMessageNew } from '@/lib/ws';
 
 export default function ChatsPage() {
   const router = useRouter();
@@ -23,6 +26,9 @@ export default function ChatsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
+  const { subscribe } = useSocket();
+  const [incomingToast, setIncomingToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Fetch conversations from the real backend API
   const fetchConversations = useCallback(async () => {
@@ -44,6 +50,47 @@ export default function ChatsPage() {
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
+
+  // WebSocket subscription for new messages in other conversations
+  useEffect(() => {
+    const unsubNew = subscribe<WsMessageNew>('message:new', (ev) => {
+      if (ev.message.conversation_id !== selectedId) {
+        setConversations((prev) => {
+          const src = prev.find((c) => c.id === ev.message.conversation_id);
+          const name = src?.name || 'Another conversation';
+          if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+          setIncomingToast(`New message in ${name}`);
+          toastTimerRef.current = setTimeout(() => setIncomingToast(null), 4000);
+          return prev.map((c) =>
+            c.id === ev.message.conversation_id
+              ? {
+                  ...c,
+                  last_message_preview: ev.message.content ?? '',
+                  last_message_at: ev.message.created_at,
+                  unread_count: (c.unread_count || 0) + 1,
+                }
+              : c
+          );
+        });
+      } else {
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === selectedId
+              ? {
+                  ...c,
+                  last_message_preview: ev.message.content ?? '',
+                  last_message_at: ev.message.created_at,
+                }
+              : c
+          )
+        );
+      }
+    });
+
+    return () => {
+      unsubNew();
+    };
+  }, [subscribe, selectedId]);
 
   // Sort conversations by most recent (last_message_at descending)
   const sortedConversations = useMemo(() => {
@@ -422,6 +469,18 @@ export default function ChatsPage() {
           </div>
         )}
       </main>
+
+      {/* Cross-conversation incoming message Toast */}
+      {incomingToast && (
+        <Toast
+          message={incomingToast}
+          type="info"
+          onClose={() => {
+            if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+            setIncomingToast(null);
+          }}
+        />
+      )}
 
       {/* New Chat Modal */}
       <Modal

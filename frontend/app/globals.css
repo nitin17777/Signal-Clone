@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Dark theme (default) ── */
 :root {
   --accent-blue: #2C6BED;
   --bg-dark: #1B1C1F;
@@ -18,8 +19,27 @@
   --spacing-panel-padding: 16px;
 }
 
+/* ── Light theme — applied when .dark is NOT on <html> ── */
+html:not(.dark) {
+  --bg-dark: #F0F2F5;
+  --bg-panel: #FFFFFF;
+  --bubble-received: #E8E8EA;
+  --text-primary: #111114;
+  --text-secondary: #5A5C66;
+}
+
+/* ── Dark theme explicit override (matches Tailwind darkMode:'class') ── */
+html.dark {
+  --bg-dark: #1B1C1F;
+  --bg-panel: #26282C;
+  --bubble-received: #2C2C2E;
+  --text-primary: #E4E4E6;
+  --text-secondary: #8B8E96;
+}
+
 body {
-  background-color: #1B1C1F;
-  color: #E4E4E6;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
   font-family: system-ui, -apple-system, "Inter", sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }

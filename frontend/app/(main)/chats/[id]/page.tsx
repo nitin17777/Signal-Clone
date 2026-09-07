@@ -11,6 +11,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
+import { Toast } from '@/components/ui/Toast';
 import { ConversationListItem } from '@/components/contacts/ConversationListItem';
 import { NewGroupModal } from '@/components/contacts/NewGroupModal';
 import { ChatHeader } from '@/components/chat/ChatHeader';
@@ -52,6 +53,9 @@ export default function ChatDetailPage() {
   const [typingUsers, setTypingUsers] = useState<Map<number, string>>(new Map());
   const typingTimersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  // Toast for messages received in other conversations
+  const [incomingToast, setIncomingToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Fetch conversations list for sidebar
   const fetchSidebarConversations = useCallback(async () => {
@@ -115,7 +119,24 @@ export default function ChatDetailPage() {
   // ------------------------------------------------------------------
   useEffect(() => {
     const unsubNew = subscribe<WsMessageNew>('message:new', (ev) => {
-      if (ev.message.conversation_id !== conversationId) return;
+      if (ev.message.conversation_id !== conversationId) {
+        // Message is for a DIFFERENT conversation — show a toast
+        setConversations((prev) => {
+          const src = prev.find((c) => c.id === ev.message.conversation_id);
+          const name = src?.name || 'Another conversation';
+          // Clear any existing toast timer
+          if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+          setIncomingToast(`New message in ${name}`);
+          toastTimerRef.current = setTimeout(() => setIncomingToast(null), 4000);
+          // Also update that conversation's preview
+          return prev.map((c) =>
+            c.id === ev.message.conversation_id
+              ? { ...c, last_message_preview: ev.message.content ?? '', last_message_at: ev.message.created_at }
+              : c
+          );
+        });
+        return;
+      }
       setMessages((prev) => {
         // Deduplicate by id (sender might have added it optimistically)
         if (prev.some((m) => m.id === ev.message.id)) return prev;
@@ -486,6 +507,18 @@ export default function ChatDetailPage() {
           />
         )}
       </main>
+
+      {/* Cross-conversation incoming message Toast */}
+      {incomingToast && (
+        <Toast
+          message={incomingToast}
+          type="info"
+          onClose={() => {
+            if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+            setIncomingToast(null);
+          }}
+        />
+      )}
 
       {/* New Chat Modal */}
       <Modal

@@ -3,10 +3,25 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { MainNav } from '@/components/ui/MainNav';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+
+  // Apply saved theme preference before first render
+  useEffect(() => {
+    const saved = localStorage.getItem('signal-theme');
+    if (saved === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (saved === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      // Default to dark (Signal vibe)
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('signal-theme', 'dark');
+    }
+  }, []);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -29,5 +44,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <div className="flex h-screen w-full overflow-hidden bg-bg-dark">
+      <MainNav />
+      <div className="flex-1 overflow-hidden">{children}</div>
+    </div>
+  );
 }
+
