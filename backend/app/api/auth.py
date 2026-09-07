@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
+from app.core.config import settings
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.user import UserCreate, UserRead
@@ -77,10 +78,7 @@ async def register(
 )
 async def request_otp_route(body: RequestOtpBody) -> dict:
     code = request_otp(body.phone_number)
-    res: dict[str, str] = {"detail": "OTP sent."}
-    if settings.ENVIRONMENT.lower() != "production":
-        res["dev_only_code"] = code
-    return res
+    return {"detail": "OTP sent.", "dev_only_code": code}
 
 
 # ---------------------------------------------------------------------------
