@@ -5,7 +5,18 @@
  */
 
 export function getApiBaseUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  let raw = process.env.NEXT_PUBLIC_API_URL;
+  if (!raw) {
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+      raw = 'https://signal-clone-x1x8.onrender.com';
+    } else if (process.env.NODE_ENV === 'production') {
+      raw = 'https://signal-clone-x1x8.onrender.com';
+    } else {
+      raw = 'http://localhost:8000';
+    }
+  } else if (typeof window !== 'undefined' && window.location.protocol === 'https:' && raw.startsWith('http://localhost')) {
+    raw = 'https://signal-clone-x1x8.onrender.com';
+  }
   return raw.trim().replace(/\/+$/, '').replace(/\/api\/v1\/?$/, '');
 }
 

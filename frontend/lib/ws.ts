@@ -9,7 +9,18 @@
  */
 
 export function getWsUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+  let raw = process.env.NEXT_PUBLIC_WS_URL;
+  if (!raw) {
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+      raw = 'wss://signal-clone-x1x8.onrender.com';
+    } else if (process.env.NODE_ENV === 'production') {
+      raw = 'wss://signal-clone-x1x8.onrender.com';
+    } else {
+      raw = 'ws://localhost:8000';
+    }
+  } else if (typeof window !== 'undefined' && window.location.protocol === 'https:' && raw.startsWith('ws://localhost')) {
+    raw = 'wss://signal-clone-x1x8.onrender.com';
+  }
   const clean = raw.trim().replace(/\/+$/, '').replace(/\/ws\/?$/, '');
   return `${clean}/ws`;
 }
