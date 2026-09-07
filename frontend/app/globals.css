@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent-blue: #2C6BED;
+  --bg-dark: #1B1C1F;
+  --bg-panel: #26282C;
+  --bubble-sent: #2C6BED;
+  --bubble-received: #2C2C2E;
+  --text-primary: #E4E4E6;
+  --text-secondary: #8B8E96;
+  --online-green: #4CD964;
+  --unread-badge: #2C6BED;
+  --radius-bubble: 18px;
+  --radius-panel: 8px;
+  --spacing-message-gap: 4px;
+  --spacing-panel-padding: 16px;
+}
+
+body {
+  background-color: #1B1C1F;
+  color: #E4E4E6;
+  font-family: system-ui, -apple-system, "Inter", sans-serif;
+}

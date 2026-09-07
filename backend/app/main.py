@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Primary auth router (per api-contract.md spec)
 from app.api.auth import router as auth_router
+from app.api.conversations import router as conversations_router
+from app.api.messages import router as messages_router
 
 app = FastAPI(
     title="Signal Clone API",
@@ -30,6 +31,8 @@ app.add_middleware(
 # Routers
 # ---------------------------------------------------------------------------
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(conversations_router, prefix="/api/v1")
+app.include_router(messages_router, prefix="/api/v1")
 
 
 # ---------------------------------------------------------------------------
