@@ -42,9 +42,8 @@ const NAV_ITEMS: NavItem[] = [
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
         className="w-[20px] h-[20px]">
-        <rect x="5" y="3" width="14" height="18" rx="2" ry="2" />
-        <line x1="9" y1="7" x2="15" y2="7" />
-        <line x1="9" y1="11" x2="15" y2="11" />
+        <rect x="3" y="3" width="13" height="18" rx="2" ry="2" />
+        <path d="M16 8h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-1" />
       </svg>
     ),
   },
