@@ -16,9 +16,9 @@ export default function CallsPage() {
   };
 
   return (
-    <div className="flex h-full w-full bg-[#1B1C1D] text-text-primary select-none overflow-hidden">
+    <div className="flex h-full w-full bg-[#121214] text-white select-none overflow-hidden">
       {/* Calls Sidebar / List Pane */}
-      <div className="w-full md:w-80 lg:w-[360px] flex flex-col border-r border-[#2C2D30]/80 h-full bg-[#1B1C1D]">
+      <div className="w-full md:w-80 lg:w-[360px] flex flex-col border-r border-[#28282B] h-full bg-[#18181A]">
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-4 pb-3">
           <h1 className="text-[22px] font-bold text-white tracking-tight">Calls</h1>
@@ -110,7 +110,7 @@ export default function CallsPage() {
       </div>
 
       {/* Right Main Placeholder Pane */}
-      <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-[#18191B] p-8 text-center">
+      <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-[#121214] p-8 text-center">
         <div className="w-16 h-16 rounded-full bg-[#28282A] flex items-center justify-center text-[#8E9096] mb-3">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8">
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.77 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />

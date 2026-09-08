@@ -58,7 +58,7 @@ export const MainNav: React.FC = () => {
     <nav
       id="main-nav"
       aria-label="Main navigation"
-      className="hidden md:flex flex-col items-center justify-between py-3 px-2 w-[60px] shrink-0 border-r border-[#2C2D30]/80 bg-[#1F2022] h-full select-none z-20"
+      className="hidden md:flex flex-col items-center justify-between py-3 px-2 w-[60px] shrink-0 border-r border-[#28282B] bg-[#18181A] h-full select-none z-20"
     >
       <div className="flex flex-col items-center gap-4 w-full">
         {/* Hamburger Menu Button */}
@@ -67,7 +67,7 @@ export const MainNav: React.FC = () => {
             type="button"
             onClick={() => setShowMenu((prev) => !prev)}
             title="Signal Menu"
-            className="w-10 h-10 rounded-[8px] flex items-center justify-center text-[#A0A2A8] hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+            className="w-10 h-10 rounded-[8px] flex items-center justify-center text-[#9E9E9E] hover:text-white hover:bg-[#232426] active:scale-95 transition-all"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
@@ -80,25 +80,25 @@ export const MainNav: React.FC = () => {
 
           {/* Desktop Menu Dropdown */}
           {showMenu && (
-            <div className="absolute top-12 left-2 z-50 bg-[#28282A] border border-neutral-700/80 rounded-[12px] p-1.5 shadow-2xl w-48 text-xs text-text-primary flex flex-col gap-0.5 animate-in fade-in zoom-in-95 duration-100">
-              <div className="px-3 py-2 font-semibold border-b border-neutral-700/60 text-white flex items-center gap-2">
+            <div className="absolute top-12 left-2 z-50 bg-[#1E1F22] border border-[#28282B] rounded-[14px] p-1.5 shadow-2xl w-48 text-xs text-text-primary flex flex-col gap-0.5 animate-in fade-in zoom-in-95 duration-100">
+              <div className="px-3 py-2 font-semibold border-b border-[#28282B] text-white flex items-center gap-2">
                 <Avatar name={user?.display_name || 'User'} src={user?.avatar_url} size="sm" />
                 <div className="truncate">
                   <p className="truncate">{user?.display_name || 'User'}</p>
-                  <p className="text-[10px] text-text-secondary truncate">{user?.phone_number || ''}</p>
+                  <p className="text-[10px] text-[#9E9E9E] truncate">{user?.phone_number || ''}</p>
                 </div>
               </div>
               <Link
                 href="/settings"
                 onClick={() => setShowMenu(false)}
-                className="px-3 py-2 rounded-md hover:bg-white/10 transition-colors flex items-center gap-2"
+                className="px-3 py-2 rounded-md hover:bg-[#232426] transition-colors flex items-center gap-2"
               >
                 <span>⚙️</span> Preferences / Settings
               </Link>
               <Link
                 href="/linked-devices"
                 onClick={() => setShowMenu(false)}
-                className="px-3 py-2 rounded-md hover:bg-white/10 transition-colors flex items-center gap-2"
+                className="px-3 py-2 rounded-md hover:bg-[#232426] transition-colors flex items-center gap-2"
               >
                 <span>📱</span> Linked Devices
               </Link>
@@ -128,8 +128,8 @@ export const MainNav: React.FC = () => {
                 className={`
                   flex items-center justify-center w-11 h-9 rounded-[10px] transition-all duration-150 active:scale-95
                   ${isActive
-                    ? 'bg-[#3B3C3E] text-white shadow-sm'
-                    : 'text-[#8E9096] hover:text-white hover:bg-white/5'
+                    ? 'bg-[#323336] text-white shadow-sm'
+                    : 'text-[#9E9E9E] hover:text-white hover:bg-[#232426]'
                   }
                 `}
               >
@@ -147,8 +147,8 @@ export const MainNav: React.FC = () => {
         className={`
           flex items-center justify-center w-11 h-9 rounded-[10px] transition-all duration-150 active:scale-95
           ${pathname.startsWith('/settings')
-            ? 'bg-[#3B3C3E] text-white shadow-sm'
-            : 'text-[#8E9096] hover:text-white hover:bg-white/5'
+            ? 'bg-[#323336] text-white shadow-sm'
+            : 'text-[#9E9E9E] hover:text-white hover:bg-[#232426]'
           }
         `}
       >

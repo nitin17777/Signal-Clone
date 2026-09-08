@@ -265,9 +265,9 @@ export default function ChatDetailPage() {
     (conversationDetail?.type === 'direct' ? 'Direct Message' : 'Conversation');
 
   return (
-    <div className="flex h-screen w-full bg-bg-dark text-text-primary overflow-hidden">
+    <div className="flex h-screen w-full bg-[#121214] text-white overflow-hidden">
       {/* ---------------- Left Sidebar: Conversation List (Desktop) ---------------- */}
-      <aside className="hidden md:flex w-80 lg:w-[350px] flex-col border-r border-[#2C2D30]/80 bg-[#1B1C1D] shrink-0 h-full">
+      <aside className="hidden md:flex w-80 lg:w-[350px] flex-col border-r border-[#28282B] bg-[#18181A] shrink-0 h-full">
         {/* Top Header: Chats title & actions matching exact Signal screenshot */}
         <div className="flex items-center justify-between px-5 pt-4 pb-2">
           <h1 className="text-[22px] font-bold text-white tracking-tight">Chats</h1>
@@ -429,7 +429,7 @@ export default function ChatDetailPage() {
 
       {/* ---------------- Right Chat Pane ---------------- */}
       <main className="flex-1 flex flex-row h-full overflow-hidden">
-        <div className="flex-1 flex flex-col h-full bg-[#18191C] overflow-hidden">
+        <div className="flex-1 flex flex-col h-full bg-[#121214] overflow-hidden">
           {/* Chat Header */}
           <ChatHeader
             name={chatTitle}

@@ -132,10 +132,10 @@ export default function ChatsPage() {
   );
 
   return (
-    <div className="flex h-screen w-full bg-bg-dark text-text-primary overflow-hidden">
+    <div className="flex h-screen w-full bg-[#121214] text-white overflow-hidden">
       {/* ---------------- Left Sidebar: Conversation List ---------------- */}
       <aside
-        className={`w-full md:w-80 lg:w-[350px] flex flex-col border-r border-[#2C2D30]/80 bg-[#1B1C1D] shrink-0 h-full ${
+        className={`w-full md:w-80 lg:w-[350px] flex flex-col border-r border-[#28282B] bg-[#18181A] shrink-0 h-full ${
           selectedId !== null ? 'hidden md:flex' : 'flex'
         }`}
       >
@@ -334,7 +334,7 @@ export default function ChatsPage() {
 
       {/* ---------------- Right Pane: Active Chat or Empty State ---------------- */}
       <main
-        className={`flex-1 flex flex-col h-full bg-[#18191C] overflow-hidden ${
+        className={`flex-1 flex flex-col h-full bg-[#121214] overflow-hidden ${
           selectedId === null ? 'hidden md:flex' : 'flex'
         }`}
       >

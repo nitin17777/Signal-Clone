@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Avatar } from '@/components/ui/Avatar';
-import { Button } from '@/components/ui/Button';
 import { api } from '@/lib/api';
 
 type SettingsTab =
@@ -20,8 +18,10 @@ type SettingsTab =
 
 export default function SettingsPage() {
   const { user, setUser, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
-  const [isDark, setIsDark] = useState(true);
+  const [activeTab, setActiveTab] = useState<SettingsTab>('appearance');
+  const [themeMode, setThemeMode] = useState<'system' | 'dark' | 'light'>('system');
+  const [zoomLevel, setZoomLevel] = useState('100%');
+  const [language, setLanguage] = useState('System Language');
 
   // Profile editing state
   const [displayName, setDisplayName] = useState(user?.display_name || '');
@@ -48,17 +48,29 @@ export default function SettingsPage() {
   // Read current theme on mount
   useEffect(() => {
     const saved = localStorage.getItem('signal-theme');
-    setIsDark(saved !== 'light');
+    if (saved === 'light') {
+      setThemeMode('light');
+      document.documentElement.classList.remove('dark');
+    } else if (saved === 'dark') {
+      setThemeMode('dark');
+      document.documentElement.classList.add('dark');
+    } else {
+      setThemeMode('system');
+      document.documentElement.classList.add('dark');
+    }
   }, []);
 
-  const toggleTheme = (dark: boolean) => {
-    setIsDark(dark);
-    if (dark) {
+  const handleThemeChange = (mode: 'system' | 'dark' | 'light') => {
+    setThemeMode(mode);
+    if (mode === 'light') {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('signal-theme', 'light');
+    } else if (mode === 'dark') {
       document.documentElement.classList.add('dark');
       localStorage.setItem('signal-theme', 'dark');
     } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('signal-theme', 'light');
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('signal-theme', 'system');
     }
   };
 
@@ -173,9 +185,9 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="flex h-screen w-full bg-[#18191C] text-text-primary overflow-hidden">
+    <div className="flex h-screen w-full bg-[#121214] text-white overflow-hidden">
       {/* ---------------- Left Sidebar: Settings Navigation ---------------- */}
-      <aside className="w-full md:w-80 lg:w-[320px] flex flex-col border-r border-[#2C2D30]/80 bg-[#1B1C1D] shrink-0 h-full select-none">
+      <aside className="w-full md:w-80 lg:w-[320px] flex flex-col border-r border-[#28282B] bg-[#18181A] shrink-0 h-full select-none">
         {/* Settings Header */}
         <div className="px-5 pt-4 pb-3">
           <h1 className="text-[22px] font-bold text-white tracking-tight">Settings</h1>
@@ -187,20 +199,20 @@ export default function SettingsPage() {
             onClick={() => setActiveTab('profile')}
             className={`w-full text-left flex items-center gap-3.5 px-3 py-3 rounded-[14px] transition-all duration-150 ${
               activeTab === 'profile'
-                ? 'bg-[#38393C] text-white shadow-sm'
-                : 'hover:bg-[#28282A] text-text-primary'
+                ? 'bg-[#323336] text-white shadow-sm'
+                : 'hover:bg-[#232426] text-white'
             }`}
           >
             {/* White circle avatar matching screenshot */}
-            <div className="w-11 h-11 rounded-full bg-[#E5E6E8] text-[#1B1C1D] flex items-center justify-center font-bold text-[17px] shrink-0 shadow-sm">
-              {user?.display_name?.charAt(0).toUpperCase() || 'U'}
+            <div className="w-11 h-11 rounded-full bg-[#E5E6E8] text-[#18181A] flex items-center justify-center font-bold text-[17px] shrink-0 shadow-sm">
+              {user?.display_name?.charAt(0).toUpperCase() || 'N'}
             </div>
             <div className="min-w-0 flex-1">
               <span className="text-[15px] font-semibold text-white block truncate leading-tight">
-                {user?.display_name || 'Signal User'}
+                {user?.display_name || 'Nitin'}
               </span>
-              <p className="text-[12px] text-[#A0A2A8] truncate mt-0.5">
-                {user?.phone_number || (user?.username ? `@${user.username}` : 'No phone number')}
+              <p className="text-[12px] text-[#9E9E9E] truncate mt-0.5">
+                {user?.phone_number || (user?.username ? `@${user.username}` : '091190 91688')}
               </p>
             </div>
           </button>
@@ -214,13 +226,13 @@ export default function SettingsPage() {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-[10px] text-[14px] font-medium transition-all duration-150 ${
+                className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-[12px] text-[14px] font-medium transition-all duration-150 ${
                   isActive
-                    ? 'bg-[#38393C] text-white shadow-sm'
-                    : 'text-[#E1E2E5] hover:bg-white/5 hover:text-white'
+                    ? 'bg-[#323336] text-white shadow-sm'
+                    : 'text-white hover:bg-[#232426]'
                 }`}
               >
-                <span className={`${isActive ? 'text-white' : 'text-[#A0A2A8]'}`}>
+                <span className={`${isActive ? 'text-white' : 'text-[#9E9E9E]'}`}>
                   {item.icon}
                 </span>
                 <span>{item.label}</span>
@@ -230,26 +242,124 @@ export default function SettingsPage() {
         </div>
       </aside>
 
-      {/* ---------------- Right Content View ---------------- */}
-      <main className="flex-1 h-full overflow-y-auto bg-[#18191C] px-6 md:px-12 py-8">
+      {/* ---------------- Right Content View (Matching Screenshot Card Style) ---------------- */}
+      <main className="flex-1 h-full overflow-y-auto bg-[#121214] px-6 md:px-12 py-8 select-none">
         <div className="max-w-xl mx-auto">
-          {/* ================= PROFILE VIEW (Exact Match to User Screenshot) ================= */}
+          {/* ================= APPEARANCE VIEW (Exact Match to User Screenshot) ================= */}
+          {activeTab === 'appearance' && (
+            <div className="animate-in fade-in duration-150">
+              {/* Centered Header */}
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Appearance</h2>
+
+              {/* Floating Settings Card */}
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
+                {/* Language Row */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[#9E9E9E]">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="2" y1="12" x2="22" y2="12" />
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    </svg>
+                    <span className="text-[14px] text-white font-normal">Language</span>
+                  </div>
+                  <button
+                    onClick={() => alert('Language options: English (default)')}
+                    className="flex items-center gap-1 text-[13px] text-[#9E9E9E] hover:text-white transition-colors"
+                  >
+                    <span>{language}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Theme Row */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[#9E9E9E]">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor" fillOpacity="0.6" />
+                    </svg>
+                    <span className="text-[14px] text-white font-normal">Theme</span>
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={themeMode}
+                      onChange={(e) => handleThemeChange(e.target.value as any)}
+                      className="appearance-none bg-[#2C2D30] hover:bg-[#36373A] text-white text-[13px] font-medium px-4 py-1.5 pr-8 rounded-lg focus:outline-none cursor-pointer transition-colors"
+                    >
+                      <option value="system">System</option>
+                      <option value="dark">Dark</option>
+                      <option value="light">Light</option>
+                    </select>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[#9E9E9E] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Chat color Row */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[#9E9E9E]">
+                      <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+                      <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+                      <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+                      <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+                      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+                    </svg>
+                    <span className="text-[14px] text-white font-normal">Chat color</span>
+                  </div>
+                  <div className="w-4 h-4 rounded-full bg-signal-blue ring-2 ring-white/10" />
+                </div>
+
+                {/* Zoom level Row */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[#9E9E9E]">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <span className="text-[14px] text-white font-normal">Zoom level</span>
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={zoomLevel}
+                      onChange={(e) => setZoomLevel(e.target.value)}
+                      className="appearance-none bg-[#2C2D30] hover:bg-[#36373A] text-white text-[13px] font-medium px-4 py-1.5 pr-8 rounded-lg focus:outline-none cursor-pointer transition-colors"
+                    >
+                      <option value="80%">80%</option>
+                      <option value="90%">90%</option>
+                      <option value="100%">100%</option>
+                      <option value="110%">110%</option>
+                      <option value="125%">125%</option>
+                    </select>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[#9E9E9E] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ================= PROFILE VIEW ================= */}
           {activeTab === 'profile' && (
             <div className="flex flex-col items-center animate-in fade-in duration-150">
-              {/* Profile Title */}
               <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Profile</h2>
 
               {/* Large White Avatar Circle */}
               <div className="relative mb-2">
-                <div className="w-24 h-24 rounded-full bg-[#E5E6E8] text-[#1B1C1D] flex items-center justify-center font-bold text-3xl shadow-md select-none">
-                  {displayName?.charAt(0).toUpperCase() || 'U'}
+                <div className="w-24 h-24 rounded-full bg-[#E5E6E8] text-[#18181A] flex items-center justify-center font-bold text-3xl shadow-md select-none">
+                  {displayName?.charAt(0).toUpperCase() || 'N'}
                 </div>
               </div>
 
               {/* Edit Photo Button */}
               <button
                 type="button"
-                onClick={() => alert('Photo upload dialog: You can change your avatar in upcoming sync.')}
+                onClick={() => alert('Photo upload dialog')}
                 className="px-3.5 py-1 rounded-full bg-[#2C2D30] hover:bg-[#38393C] text-[12px] font-medium text-white transition-colors mb-8 active:scale-95"
               >
                 Edit photo
@@ -265,7 +375,7 @@ export default function SettingsPage() {
               <div className="w-full space-y-6 text-left">
                 {/* Display Name Row */}
                 <div className="flex items-start gap-3.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#A0A2A8] mt-1 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#9E9E9E] mt-1 shrink-0">
                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                   </svg>
@@ -293,8 +403,8 @@ export default function SettingsPage() {
                         onClick={() => setIsEditingName(true)}
                         className="group flex items-center justify-between cursor-pointer py-0.5"
                       >
-                        <span className="text-[15px] font-medium text-white">{displayName || 'Set Name'}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#8E9096] group-hover:text-white transition-colors">
+                        <span className="text-[15px] font-medium text-white">{displayName || 'Nitin'}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#9E9E9E] group-hover:text-white transition-colors">
                           <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                         </svg>
                       </div>
@@ -304,7 +414,7 @@ export default function SettingsPage() {
 
                 {/* About / Status Row */}
                 <div className="flex items-start gap-3.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#A0A2A8] mt-1 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#9E9E9E] mt-1 shrink-0">
                     <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                   </svg>
                   <div className="flex-1 min-w-0">
@@ -332,31 +442,31 @@ export default function SettingsPage() {
                         className="group flex items-center justify-between cursor-pointer py-0.5"
                       >
                         <span className="text-[14px] text-white">{statusMessage || 'About'}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#8E9096] group-hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#9E9E9E] group-hover:text-white transition-colors">
                           <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                         </svg>
                       </div>
                     )}
-                    <p className="text-[12px] text-[#8E9096] mt-2 leading-relaxed">
+                    <p className="text-[12px] text-[#9E9E9E] mt-2 leading-relaxed">
                       Your profile and changes to it will be visible to people you message, contacts and groups.
                     </p>
                   </div>
                 </div>
 
-                <div className="border-t border-[#2C2D30]/90 pt-6">
+                <div className="border-t border-[#28282B] pt-6">
                   {/* Username Row */}
                   <div className="flex items-start gap-3.5">
-                    <span className="text-[18px] text-[#A0A2A8] font-bold mt-0.5 shrink-0 select-none">@</span>
+                    <span className="text-[18px] text-[#9E9E9E] font-bold mt-0.5 shrink-0 select-none">@</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between py-0.5 cursor-pointer group">
                         <span className="text-[14px] text-white">
                           {user?.username ? `@${user.username}` : 'Username'}
                         </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#8E9096] group-hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#9E9E9E] group-hover:text-white transition-colors">
                           <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                         </svg>
                       </div>
-                      <p className="text-[12px] text-[#8E9096] mt-2 leading-relaxed">
+                      <p className="text-[12px] text-[#9E9E9E] mt-2 leading-relaxed">
                         People can now message you using your optional username so you don&apos;t have to give out your phone number.
                       </p>
                     </div>
@@ -366,102 +476,39 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* ================= APPEARANCE VIEW ================= */}
-          {activeTab === 'appearance' && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              <h2 className="text-[20px] font-bold text-white mb-4">Appearance</h2>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] space-y-4">
-                <span className="text-[14px] font-semibold text-white block">Theme</span>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => toggleTheme(false)}
-                    className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${
-                      !isDark
-                        ? 'border-signal-blue bg-signal-blue/10 text-white'
-                        : 'border-[#2C2D30] hover:border-neutral-500 text-[#A0A2A8]'
-                    }`}
-                  >
-                    <span className="text-xl">☀️</span>
-                    <span className="text-xs font-semibold">Light</span>
-                  </button>
-
-                  <button
-                    onClick={() => toggleTheme(true)}
-                    className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${
-                      isDark
-                        ? 'border-signal-blue bg-signal-blue/10 text-white'
-                        : 'border-[#2C2D30] hover:border-neutral-500 text-[#A0A2A8]'
-                    }`}
-                  >
-                    <span className="text-xl">🌙</span>
-                    <span className="text-xs font-semibold">Dark</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] flex items-center justify-between">
-                <div>
-                  <span className="text-[14px] font-semibold text-white block">Chat Color</span>
-                  <p className="text-[12px] text-[#8E9096] mt-0.5">Customize default speech bubble accent color</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-signal-blue ring-2 ring-white/20" />
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* ================= GENERAL VIEW ================= */}
           {activeTab === 'general' && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              <h2 className="text-[20px] font-bold text-white mb-4">General</h2>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] space-y-3">
+            <div className="animate-in fade-in duration-150">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">General</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[14px] font-medium text-white block">System Startup</span>
-                    <p className="text-[12px] text-[#8E9096]">Open Signal automatically on computer startup</p>
-                  </div>
+                  <span className="text-[14px] text-white">System Startup</span>
                   <input type="checkbox" defaultChecked className="accent-signal-blue w-4 h-4 cursor-pointer" />
                 </div>
-              </div>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[14px] font-medium text-white block">App Version</span>
-                    <p className="text-[12px] text-[#8E9096]">Signal Desktop Clone v7.0.0 (Production)</p>
-                  </div>
+                <div className="flex items-center justify-between pt-3 border-t border-[#28282B]">
+                  <span className="text-[14px] text-white">App Version</span>
+                  <span className="text-[13px] text-[#9E9E9E]">Signal Desktop v7.0.0</span>
                 </div>
-              </div>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-red-500/20 flex items-center justify-between">
-                <div>
-                  <span className="text-[14px] font-medium text-red-400 block">Sign Out</span>
-                  <p className="text-[12px] text-[#8E9096]">Log out of this device</p>
+                <div className="flex items-center justify-between pt-3 border-t border-[#28282B]">
+                  <span className="text-[14px] text-red-400 font-medium">Sign Out</span>
+                  <button
+                    onClick={() => logout()}
+                    className="px-3 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-semibold transition-colors"
+                  >
+                    Log Out
+                  </button>
                 </div>
-                <button
-                  onClick={() => logout()}
-                  className="px-4 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-semibold transition-colors"
-                >
-                  Log Out
-                </button>
               </div>
             </div>
           )}
 
           {/* ================= NOTIFICATIONS VIEW ================= */}
           {activeTab === 'notifications' && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              <h2 className="text-[20px] font-bold text-white mb-4">Notifications</h2>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] space-y-4">
+            <div className="animate-in fade-in duration-150">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Notifications</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[14px] font-medium text-white block">Sound Alerts</span>
-                    <p className="text-[12px] text-[#8E9096]">Play audio chime for incoming messages</p>
-                  </div>
+                  <span className="text-[14px] text-white">Sound Alerts</span>
                   <input
                     type="checkbox"
                     checked={soundNotifications}
@@ -469,12 +516,8 @@ export default function SettingsPage() {
                     className="accent-signal-blue w-4 h-4 cursor-pointer"
                   />
                 </div>
-
-                <div className="flex items-center justify-between pt-3 border-t border-[#2C2D30]">
-                  <div>
-                    <span className="text-[14px] font-medium text-white block">Show Previews</span>
-                    <p className="text-[12px] text-[#8E9096]">Display sender name and message in desktop toasts</p>
-                  </div>
+                <div className="flex items-center justify-between pt-3 border-t border-[#28282B]">
+                  <span className="text-[14px] text-white">Show Message Previews</span>
                   <input type="checkbox" defaultChecked className="accent-signal-blue w-4 h-4 cursor-pointer" />
                 </div>
               </div>
@@ -483,15 +526,11 @@ export default function SettingsPage() {
 
           {/* ================= PRIVACY VIEW ================= */}
           {activeTab === 'privacy' && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              <h2 className="text-[20px] font-bold text-white mb-4">Privacy</h2>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] space-y-4">
+            <div className="animate-in fade-in duration-150">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Privacy</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[14px] font-medium text-white block">Read Receipts</span>
-                    <p className="text-[12px] text-[#8E9096]">See and share when messages have been read</p>
-                  </div>
+                  <span className="text-[14px] text-white">Read Receipts</span>
                   <input
                     type="checkbox"
                     checked={readReceipts}
@@ -499,12 +538,8 @@ export default function SettingsPage() {
                     className="accent-signal-blue w-4 h-4 cursor-pointer"
                   />
                 </div>
-
-                <div className="flex items-center justify-between pt-3 border-t border-[#2C2D30]">
-                  <div>
-                    <span className="text-[14px] font-medium text-white block">Typing Indicators</span>
-                    <p className="text-[12px] text-[#8E9096]">See and share when messages are being typed</p>
-                  </div>
+                <div className="flex items-center justify-between pt-3 border-t border-[#28282B]">
+                  <span className="text-[14px] text-white">Typing Indicators</span>
                   <input
                     type="checkbox"
                     checked={typingIndicators}
@@ -513,27 +548,16 @@ export default function SettingsPage() {
                   />
                 </div>
               </div>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] space-y-2">
-                <span className="text-[14px] font-medium text-white block">End-to-End Encryption</span>
-                <p className="text-[12px] text-[#8E9096] leading-relaxed">
-                  All messages and media are end-to-end encrypted with the Signal Protocol. Keys are stored locally on your device.
-                </p>
-              </div>
             </div>
           )}
 
           {/* ================= CHATS VIEW ================= */}
           {activeTab === 'chats' && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              <h2 className="text-[20px] font-bold text-white mb-4">Chats</h2>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] space-y-4">
+            <div className="animate-in fade-in duration-150">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Chats</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[14px] font-medium text-white block">Press Enter to Send</span>
-                    <p className="text-[12px] text-[#8E9096]">Send message immediately on Enter keypress</p>
-                  </div>
+                  <span className="text-[14px] text-white">Press Enter to Send</span>
                   <input
                     type="checkbox"
                     checked={enterIsSend}
@@ -541,12 +565,8 @@ export default function SettingsPage() {
                     className="accent-signal-blue w-4 h-4 cursor-pointer"
                   />
                 </div>
-
-                <div className="flex items-center justify-between pt-3 border-t border-[#2C2D30]">
-                  <div>
-                    <span className="text-[14px] font-medium text-white block">Auto-Download Media</span>
-                    <p className="text-[12px] text-[#8E9096]">Automatically download incoming photos and audio</p>
-                  </div>
+                <div className="flex items-center justify-between pt-3 border-t border-[#28282B]">
+                  <span className="text-[14px] text-white">Auto-Download Media</span>
                   <input type="checkbox" defaultChecked className="accent-signal-blue w-4 h-4 cursor-pointer" />
                 </div>
               </div>
@@ -555,15 +575,11 @@ export default function SettingsPage() {
 
           {/* ================= CALLS VIEW ================= */}
           {activeTab === 'calls' && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              <h2 className="text-[20px] font-bold text-white mb-4">Calls</h2>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] space-y-4">
+            <div className="animate-in fade-in duration-150">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Calls</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[14px] font-medium text-white block">Always Relay Calls</span>
-                    <p className="text-[12px] text-[#8E9096]">Relay calls through Signal servers to avoid revealing your IP address to your contact.</p>
-                  </div>
+                  <span className="text-[14px] text-white">Always Relay Calls</span>
                   <input
                     type="checkbox"
                     checked={relayCalls}
@@ -577,21 +593,16 @@ export default function SettingsPage() {
 
           {/* ================= DATA USAGE VIEW ================= */}
           {activeTab === 'data-usage' && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              <h2 className="text-[20px] font-bold text-white mb-4">Data usage</h2>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] space-y-3">
+            <div className="animate-in fade-in duration-150">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Data usage</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] text-white">Messages Sent</span>
-                  <span className="text-[13px] text-[#A0A2A8]">24.8 KB</span>
+                  <span className="text-[14px] text-white">Sent Messages</span>
+                  <span className="text-[13px] text-[#9E9E9E]">24.8 KB</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] text-white">Messages Received</span>
-                  <span className="text-[13px] text-[#A0A2A8]">51.2 KB</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[14px] text-white">Media Transferred</span>
-                  <span className="text-[13px] text-[#A0A2A8]">1.2 MB</span>
+                  <span className="text-[14px] text-white">Received Messages</span>
+                  <span className="text-[13px] text-[#9E9E9E]">51.2 KB</span>
                 </div>
               </div>
             </div>
@@ -599,46 +610,35 @@ export default function SettingsPage() {
 
           {/* ================= BACKUPS VIEW ================= */}
           {activeTab === 'backups' && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              <h2 className="text-[20px] font-bold text-white mb-4">Backups</h2>
-
-              <div className="p-4 rounded-[14px] bg-[#1F2022] border border-[#2C2D30] space-y-3">
-                <span className="text-[14px] font-medium text-white block">Chat Backups</span>
-                <p className="text-[12px] text-[#8E9096] leading-relaxed">
-                  Backups are encrypted with a 30-digit passphrase and saved locally to your device.
+            <div className="animate-in fade-in duration-150">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Backups</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-4 shadow-sm">
+                <p className="text-[13px] text-[#9E9E9E] leading-relaxed">
+                  Backups are encrypted with a passphrase and saved locally to your device.
                 </p>
-                <div className="pt-2">
-                  <button
-                    onClick={() => alert('Backup creation started. Encrypted archive exported.')}
-                    className="px-4 py-2 rounded-lg bg-[#2C2D30] hover:bg-[#38393C] text-xs font-semibold text-white transition-colors"
-                  >
-                    Create Backup
-                  </button>
-                </div>
+                <button
+                  onClick={() => alert('Backup created.')}
+                  className="px-4 py-2 rounded-lg bg-[#2C2D30] hover:bg-[#36373A] text-xs font-semibold text-white transition-colors"
+                >
+                  Create Backup
+                </button>
               </div>
             </div>
           )}
 
-          {/* ================= DONATE TO SIGNAL VIEW ================= */}
+          {/* ================= DONATE VIEW ================= */}
           {activeTab === 'donate' && (
-            <div className="space-y-6 animate-in fade-in duration-150 text-center">
-              <div className="w-16 h-16 rounded-full bg-signal-blue/20 text-signal-blue flex items-center justify-center mx-auto mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-              </div>
-
-              <h2 className="text-[22px] font-bold text-white">Donate to Signal</h2>
-              <p className="text-[13px] text-[#A0A2A8] max-w-sm mx-auto leading-relaxed">
-                Signal is a non-profit dedicated to private, encrypted communication. Support open-source software with a contribution.
+            <div className="animate-in fade-in duration-150 text-center">
+              <h2 className="text-[20px] font-bold text-white mb-2">Donate to Signal</h2>
+              <p className="text-[13px] text-[#9E9E9E] max-w-sm mx-auto leading-relaxed mb-6">
+                Signal is a non-profit dedicated to private, encrypted communication.
               </p>
-
-              <div className="grid grid-cols-3 gap-3 pt-2">
+              <div className="grid grid-cols-3 gap-3">
                 {['$3 / mo', '$5 / mo', '$10 / mo'].map((tier) => (
                   <button
                     key={tier}
                     onClick={() => alert(`Thank you for choosing ${tier} contribution!`)}
-                    className="p-3.5 rounded-xl border border-[#2C2D30] bg-[#1F2022] hover:border-signal-blue text-white font-semibold text-sm transition-all active:scale-95"
+                    className="p-3.5 rounded-xl border border-[#28282B] bg-[#1E1F22] hover:border-signal-blue text-white font-semibold text-sm transition-all"
                   >
                     {tier}
                   </button>

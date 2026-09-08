@@ -55,9 +55,9 @@ export default function StoriesPage() {
   );
 
   return (
-    <div className="flex h-screen w-full bg-[#18191C] text-text-primary overflow-hidden">
+    <div className="flex h-screen w-full bg-[#121214] text-white overflow-hidden">
       {/* ---------------- Left Sidebar: Stories List (Exact Match to Screenshot) ---------------- */}
-      <aside className="w-full md:w-80 lg:w-[350px] flex flex-col border-r border-[#2C2D30]/80 bg-[#1B1C1D] shrink-0 h-full select-none">
+      <aside className="w-full md:w-80 lg:w-[350px] flex flex-col border-r border-[#28282B] bg-[#18181A] shrink-0 h-full select-none">
         {/* Header: Title + Actions */}
         <div className="flex items-center justify-between px-5 pt-4 pb-2">
           <h1 className="text-[22px] font-bold text-white tracking-tight">Stories</h1>
@@ -212,7 +212,7 @@ export default function StoriesPage() {
       </aside>
 
       {/* ---------------- Right Pane: Story Viewer or Empty Placeholder ---------------- */}
-      <main className="hidden md:flex flex-1 items-center justify-center h-full bg-[#141516] p-6 select-none">
+      <main className="hidden md:flex flex-1 items-center justify-center h-full bg-[#121214] p-6 select-none">
         {activeStory ? (
           <div className="relative w-full max-w-sm aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between p-6 bg-gradient-to-br transition-all animate-in zoom-in-95 duration-200">
             {/* Story Progress bar */}

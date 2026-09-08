@@ -2,46 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Dark theme (default) ── */
+/* ── Authentic Signal Desktop Colorway ── */
 :root {
+  --signal-blue: #2C6BED;
   --accent-blue: #2C6BED;
-  --bg-dark: #1B1C1D;
-  --bg-panel: #28282A;
+  --bg-main: #121214;
+  --bg-sidebar: #18181A;
+  --bg-card: #1E1F22;
+  --bg-active: #323336;
+  --bg-hover: #232426;
+  --bg-pill: #2C2D30;
+  --border-subtle: #28282B;
   --bubble-sent: #2C6BED;
-  --bubble-received: #2E2E30;
-  --text-primary: #F2F2F2;
-  --text-secondary: #8E8E93;
+  --bubble-received: #28282B;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9E9E9E;
+  --text-muted: #8E9096;
   --online-green: #34C759;
   --unread-badge: #2C6BED;
   --radius-bubble: 18px;
-  --radius-panel: 10px;
-  --spacing-message-gap: 4px;
-  --spacing-panel-padding: 16px;
+  --radius-panel: 14px;
 }
 
 /* ── Light theme — applied when .dark is NOT on <html> ── */
 html:not(.dark) {
-  --bg-dark: #FFFFFF;
-  --bg-panel: #F2F2F7;
+  --bg-main: #FFFFFF;
+  --bg-sidebar: #F5F5F7;
+  --bg-card: #FFFFFF;
+  --bg-active: #E5E5EA;
+  --bg-hover: #EBEBEF;
+  --bg-pill: #E5E5EA;
+  --border-subtle: #E5E5EA;
   --bubble-received: #E5E5EA;
   --text-primary: #1C1C1E;
   --text-secondary: #636366;
+  --text-muted: #8E8E93;
 }
 
-/* ── Dark theme explicit override (matches Tailwind darkMode:'class') ── */
+/* ── Dark theme explicit override ── */
 html.dark {
-  --bg-dark: #1B1C1D;
-  --bg-panel: #28282A;
-  --bubble-received: #2E2E30;
-  --text-primary: #F2F2F2;
-  --text-secondary: #8E8E93;
+  --bg-main: #121214;
+  --bg-sidebar: #18181A;
+  --bg-card: #1E1F22;
+  --bg-active: #323336;
+  --bg-hover: #232426;
+  --bg-pill: #2C2D30;
+  --border-subtle: #28282B;
+  --bubble-received: #28282B;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9E9E9E;
+  --text-muted: #8E9096;
 }
 
 body {
-  background-color: var(--bg-dark);
+  background-color: var(--bg-main);
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -54,9 +71,9 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.14);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.24);
 }
