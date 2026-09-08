@@ -265,19 +265,19 @@ export default function ChatDetailPage() {
     (conversationDetail?.type === 'direct' ? 'Direct Message' : 'Conversation');
 
   return (
-    <div className="flex h-screen w-full bg-[#121214] text-white overflow-hidden">
+    <div className="flex h-screen w-full bg-[var(--bg-main)] text-[var(--text-primary)] overflow-hidden transition-colors">
       {/* ---------------- Left Sidebar: Conversation List (Desktop) ---------------- */}
-      <aside className="hidden md:flex w-80 lg:w-[350px] flex-col border-r border-[#28282B] bg-[#18181A] shrink-0 h-full">
+      <aside className="hidden md:flex w-80 lg:w-[350px] flex-col border-r border-[var(--border-subtle)] bg-[var(--bg-sidebar)] shrink-0 h-full transition-colors">
         {/* Top Header: Chats title & actions matching exact Signal screenshot */}
         <div className="flex items-center justify-between px-5 pt-4 pb-2">
-          <h1 className="text-[22px] font-bold text-white tracking-tight">Chats</h1>
+          <h1 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight">Chats</h1>
           <div className="flex items-center gap-1">
             {/* Compose / New Chat button */}
             <button
               id="new-chat-modal-btn"
               onClick={() => setIsNewChatModalOpen(true)}
               title="New chat"
-              className="p-2 text-[#A0A2A8] hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
+              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors active:scale-95"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -299,7 +299,7 @@ export default function ChatDetailPage() {
               id="new-group-modal-btn"
               onClick={() => setIsNewGroupModalOpen(true)}
               title="New Group"
-              className="p-2 text-[#A0A2A8] hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
+              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors active:scale-95"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -320,7 +320,7 @@ export default function ChatDetailPage() {
             {/* More Menu */}
             <button
               title="More options"
-              className="p-2 text-[#A0A2A8] hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
+              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors active:scale-95"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                 <circle cx="12" cy="12" r="1" />
@@ -339,11 +339,11 @@ export default function ChatDetailPage() {
               placeholder={unreadOnly ? 'Search unread chats' : 'Search'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#2C2D30] text-white text-[14px] rounded-full pl-9 pr-3 py-1.5 placeholder-[#8E9096] focus:outline-none focus:ring-1 focus:ring-neutral-500 transition-all"
+              className="w-full bg-[var(--input-bg)] text-[var(--text-primary)] text-[14px] rounded-full pl-9 pr-3 py-1.5 placeholder-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-signal-blue transition-all"
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E9096] pointer-events-none"
+              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -361,7 +361,7 @@ export default function ChatDetailPage() {
             className={`p-1.5 rounded-full transition-all ${
               unreadOnly
                 ? 'bg-signal-blue text-white shadow-md'
-                : 'text-[#8E9096] hover:text-white hover:bg-white/5'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
             }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
@@ -374,7 +374,7 @@ export default function ChatDetailPage() {
 
         {/* Filtered by unread indicator */}
         {unreadOnly && (
-          <div className="px-5 py-1 text-[13px] text-[#8E9096]">
+          <div className="px-5 py-1 text-[13px] text-[var(--text-muted)]">
             Filtered by unread
           </div>
         )}
@@ -384,10 +384,10 @@ export default function ChatDetailPage() {
           {/* Empty State when Filtered */}
           {unreadOnly && displayedConversations.length === 0 && (
             <div className="py-16 text-center px-4 flex flex-col items-center justify-center gap-3">
-              <p className="text-[15px] font-medium text-white">No unread chats</p>
+              <p className="text-[15px] font-medium text-[var(--text-primary)]">No unread chats</p>
               <button
                 onClick={() => setUnreadOnly(false)}
-                className="px-4 py-1.5 rounded-full bg-[#2C2D30] hover:bg-[#38393C] text-white text-[13px] font-medium transition-colors"
+                className="px-4 py-1.5 rounded-full bg-[var(--bg-pill)] hover:bg-[var(--bg-active)] text-[var(--text-primary)] text-[13px] font-medium transition-colors"
               >
                 Clear filter
               </button>
@@ -396,7 +396,7 @@ export default function ChatDetailPage() {
 
           {/* Empty State when search matches nothing */}
           {!unreadOnly && displayedConversations.length === 0 && (
-            <div className="py-16 text-center text-[#8E9096] text-xs px-4">
+            <div className="py-16 text-center text-[var(--text-secondary)] text-xs px-4">
               {searchQuery ? 'No matching conversations found.' : 'No conversations yet.'}
             </div>
           )}
@@ -429,7 +429,7 @@ export default function ChatDetailPage() {
 
       {/* ---------------- Right Chat Pane ---------------- */}
       <main className="flex-1 flex flex-row h-full overflow-hidden">
-        <div className="flex-1 flex flex-col h-full bg-[#121214] overflow-hidden">
+        <div className="flex-1 flex flex-col h-full bg-[var(--bg-main)] overflow-hidden">
           {/* Chat Header */}
           <ChatHeader
             name={chatTitle}

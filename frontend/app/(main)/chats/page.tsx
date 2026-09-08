@@ -132,23 +132,23 @@ export default function ChatsPage() {
   );
 
   return (
-    <div className="flex h-screen w-full bg-[#121214] text-white overflow-hidden">
+    <div className="flex h-screen w-full bg-[var(--bg-main)] text-[var(--text-primary)] overflow-hidden transition-colors">
       {/* ---------------- Left Sidebar: Conversation List ---------------- */}
       <aside
-        className={`w-full md:w-80 lg:w-[350px] flex flex-col border-r border-[#28282B] bg-[#18181A] shrink-0 h-full ${
+        className={`w-full md:w-80 lg:w-[350px] flex flex-col border-r border-[var(--border-subtle)] bg-[var(--bg-sidebar)] shrink-0 h-full transition-colors ${
           selectedId !== null ? 'hidden md:flex' : 'flex'
         }`}
       >
         {/* Top Header: Chats title & actions matching exact Signal screenshot */}
         <div className="flex items-center justify-between px-5 pt-4 pb-2">
-          <h1 className="text-[22px] font-bold text-white tracking-tight">Chats</h1>
+          <h1 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight">Chats</h1>
           <div className="flex items-center gap-1">
             {/* Compose / New Chat button */}
             <button
               id="new-chat-modal-btn"
               onClick={() => setIsNewChatModalOpen(true)}
               title="New chat"
-              className="p-2 text-[#A0A2A8] hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
+              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors active:scale-95"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -170,7 +170,7 @@ export default function ChatsPage() {
               id="new-group-modal-btn"
               onClick={() => setIsNewGroupModalOpen(true)}
               title="New Group"
-              className="p-2 text-[#A0A2A8] hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
+              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors active:scale-95"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -191,7 +191,7 @@ export default function ChatsPage() {
             {/* More Menu */}
             <button
               title="More options"
-              className="p-2 text-[#A0A2A8] hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
+              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors active:scale-95"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                 <circle cx="12" cy="12" r="1" />
@@ -210,11 +210,11 @@ export default function ChatsPage() {
               placeholder={unreadOnly ? 'Search unread chats' : 'Search'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#2C2D30] text-white text-[14px] rounded-full pl-9 pr-3 py-1.5 placeholder-[#8E9096] focus:outline-none focus:ring-1 focus:ring-neutral-500 transition-all"
+              className="w-full bg-[var(--input-bg)] text-[var(--text-primary)] text-[14px] rounded-full pl-9 pr-3 py-1.5 placeholder-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-signal-blue transition-all"
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E9096] pointer-events-none"
+              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -232,7 +232,7 @@ export default function ChatsPage() {
             className={`p-1.5 rounded-full transition-all ${
               unreadOnly
                 ? 'bg-signal-blue text-white shadow-md'
-                : 'text-[#8E9096] hover:text-white hover:bg-white/5'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
             }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
@@ -245,7 +245,7 @@ export default function ChatsPage() {
 
         {/* Filtered by unread indicator */}
         {unreadOnly && (
-          <div className="px-5 py-1 text-[13px] text-[#8E9096]">
+          <div className="px-5 py-1 text-[13px] text-[var(--text-muted)]">
             Filtered by unread
           </div>
         )}
@@ -285,10 +285,10 @@ export default function ChatsPage() {
           {/* Empty State when Filtered */}
           {!loading && !error && unreadOnly && displayedConversations.length === 0 && (
             <div className="py-16 text-center px-4 flex flex-col items-center justify-center gap-3">
-              <p className="text-[15px] font-medium text-white">No unread chats</p>
+              <p className="text-[15px] font-medium text-[var(--text-primary)]">No unread chats</p>
               <button
                 onClick={() => setUnreadOnly(false)}
-                className="px-4 py-1.5 rounded-full bg-[#2C2D30] hover:bg-[#38393C] text-white text-[13px] font-medium transition-colors"
+                className="px-4 py-1.5 rounded-full bg-[var(--bg-pill)] hover:bg-[var(--bg-active)] text-[var(--text-primary)] text-[13px] font-medium transition-colors"
               >
                 Clear filter
               </button>
@@ -297,7 +297,7 @@ export default function ChatsPage() {
 
           {/* Empty State when search matches nothing */}
           {!loading && !error && !unreadOnly && displayedConversations.length === 0 && (
-            <div className="py-16 text-center text-[#8E9096] text-xs px-4">
+            <div className="py-16 text-center text-[var(--text-secondary)] text-xs px-4">
               {searchQuery ? 'No matching conversations found.' : 'No conversations yet. Start a new chat to begin messaging!'}
             </div>
           )}
@@ -306,7 +306,6 @@ export default function ChatsPage() {
           {!loading &&
             !error &&
             displayedConversations.map((conv) => {
-              // Pass shape to ConversationListItem without modifying its internal logic
               const itemData: MockConversation = {
                 id: conv.id,
                 type: conv.type,
@@ -334,19 +333,19 @@ export default function ChatsPage() {
 
       {/* ---------------- Right Pane: Active Chat or Empty State ---------------- */}
       <main
-        className={`flex-1 flex flex-col h-full bg-[#121214] overflow-hidden ${
+        className={`flex-1 flex flex-col h-full bg-[var(--bg-main)] overflow-hidden transition-colors ${
           selectedId === null ? 'hidden md:flex' : 'flex'
         }`}
       >
         {selectedConversation ? (
           <>
             {/* Active Chat Header */}
-            <header className="flex items-center justify-between px-4 py-3.5 border-b border-neutral-800/80 bg-bg-dark shrink-0">
+            <header className="flex items-center justify-between px-4 py-3.5 border-b border-[var(--border-subtle)] bg-[var(--bg-main)] shrink-0 transition-colors">
               <div className="flex items-center gap-3 min-w-0">
                 {/* Mobile Back Button */}
                 <button
                   onClick={() => setSelectedId(null)}
-                  className="md:hidden p-1.5 -ml-1.5 text-text-secondary hover:text-text-primary rounded-lg"
+                  className="md:hidden p-1.5 -ml-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg"
                   aria-label="Back to conversations"
                 >
                   <svg
@@ -370,10 +369,10 @@ export default function ChatsPage() {
                   isOnline={selectedConversation.is_online}
                 />
                 <div className="min-w-0">
-                  <h2 className="text-sm font-semibold text-text-primary truncate">
+                  <h2 className="text-sm font-semibold text-[var(--text-primary)] truncate">
                     {selectedConversation.name || (selectedConversation.type === 'direct' ? 'Direct Message' : 'Group')}
                   </h2>
-                  <p className="text-xs text-text-secondary">
+                  <p className="text-xs text-[var(--text-secondary)]">
                     {selectedConversation.type === 'group'
                       ? 'Group conversation'
                       : selectedConversation.is_online
@@ -384,7 +383,7 @@ export default function ChatsPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-text-secondary bg-bg-panel px-2.5 py-1 rounded-full border border-neutral-800">
+                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[var(--text-secondary)] bg-[var(--bg-card)] px-2.5 py-1 rounded-full border border-[var(--border-subtle)]">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="w-3 h-3 text-online-green"
@@ -404,7 +403,7 @@ export default function ChatsPage() {
             {/* Chat Body Placeholder */}
             <div className="flex-1 overflow-y-auto p-4 flex flex-col justify-end space-y-3">
               {/* E2EE Info banner */}
-              <div className="mx-auto max-w-sm text-center py-2 px-4 rounded-panel bg-bg-panel/40 border border-neutral-800/60 text-xs text-text-secondary leading-relaxed">
+              <div className="mx-auto max-w-sm text-center py-2 px-4 rounded-panel bg-[var(--bg-card)] border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] leading-relaxed">
                 🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not
                 even Signal, can read or listen to them.
               </div>
@@ -412,10 +411,10 @@ export default function ChatsPage() {
               {/* Sample preview message bubble */}
               {selectedConversation.last_message_preview && (
                 <div className="flex justify-start">
-                  <div className="max-w-[75%] rounded-bubble bg-bubble-received px-4 py-2.5 text-sm text-text-primary shadow-sm">
+                  <div className="max-w-[75%] rounded-bubble bg-[var(--bubble-received)] px-4 py-2.5 text-sm text-[var(--text-primary)] shadow-sm">
                     <p>{selectedConversation.last_message_preview}</p>
                     {selectedConversation.last_message_at && (
-                      <span className="text-[10px] text-text-secondary block text-right mt-1">
+                      <span className="text-[10px] text-[var(--text-secondary)] block text-right mt-1">
                         {new Date(selectedConversation.last_message_at).toLocaleTimeString([], {
                           hour: 'numeric',
                           minute: '2-digit',
@@ -427,13 +426,13 @@ export default function ChatsPage() {
               )}
             </div>
 
-            {/* Message input placeholder for upcoming phase */}
-            <footer className="p-3 border-t border-neutral-800/80 bg-bg-dark shrink-0">
+            {/* Message input placeholder */}
+            <footer className="p-3 border-t border-[var(--border-subtle)] bg-[var(--bg-main)] shrink-0 transition-colors">
               <div className="flex items-center gap-2">
                 <Input
                   disabled
-                  placeholder={`Message ${selectedConversation.name || 'chat'}... (messaging active in next phase)`}
-                  className="bg-bg-panel/60 text-sm cursor-not-allowed opacity-75"
+                  placeholder={`Message ${selectedConversation.name || 'chat'}...`}
+                  className="bg-[var(--input-bg)] text-sm cursor-not-allowed opacity-75"
                 />
                 <Button disabled size="md" className="opacity-60 cursor-not-allowed">
                   Send
@@ -444,7 +443,7 @@ export default function ChatsPage() {
         ) : (
           /* Empty selection state */
           <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-            <div className="w-16 h-16 rounded-full bg-bg-panel flex items-center justify-center text-accent-blue mb-4 border border-neutral-800">
+            <div className="w-16 h-16 rounded-full bg-[var(--bg-card)] flex items-center justify-center text-signal-blue mb-4 border border-[var(--border-subtle)] shadow-sm">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -458,8 +457,8 @@ export default function ChatsPage() {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold text-text-primary mb-1">Signal for Web</h2>
-            <p className="text-xs text-text-secondary max-w-sm leading-relaxed mb-4">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-1">Signal for Web</h2>
+            <p className="text-xs text-[var(--text-secondary)] max-w-sm leading-relaxed mb-4">
               Select a conversation from the left to view messages, or start a new chat.
             </p>
             <Button variant="primary" size="sm" onClick={() => setIsNewChatModalOpen(true)}>
