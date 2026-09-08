@@ -46,6 +46,7 @@ export default function ChatDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [unreadOnly, setUnreadOnly] = useState(false);
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
   const [isGroupInfoOpen, setIsGroupInfoOpen] = useState(false);
@@ -246,12 +247,18 @@ export default function ChatDetailPage() {
     );
   }, [conversations, searchQuery]);
 
+  // Final displayed conversations (applying unread filter if active)
+  const displayedConversations = useMemo(() => {
+    if (unreadOnly) {
+      return filteredConversations.filter((c) => (c.unread_count || 0) > 0);
+    }
+    return filteredConversations;
+  }, [filteredConversations, unreadOnly]);
+
   const totalUnread = useMemo(
     () => conversations.reduce((acc, c) => acc + (c.unread_count || 0), 0),
     [conversations]
   );
-
-  // senderNameMap already defined above the WS effect
 
   const chatTitle =
     conversationDetail?.name ||
@@ -260,32 +267,39 @@ export default function ChatDetailPage() {
   return (
     <div className="flex h-screen w-full bg-bg-dark text-text-primary overflow-hidden">
       {/* ---------------- Left Sidebar: Conversation List (Desktop) ---------------- */}
-      <aside className="hidden md:flex w-80 lg:w-96 flex-col border-r border-neutral-800/80 bg-bg-dark shrink-0 h-full">
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-4 py-3.5 border-b border-neutral-800/80 bg-bg-dark/80 backdrop-blur-sm">
-          <div className="flex items-center gap-3 min-w-0">
-            <Avatar
-              name={user?.display_name || user?.username || 'Signal User'}
-              src={user?.avatar_url}
-              size="md"
-              isOnline={user?.is_online ?? true}
-            />
-            <div className="min-w-0">
-              <span className="text-sm font-semibold text-text-primary truncate block">
-                {user?.display_name || 'Signal User'}
-              </span>
-              <p className="text-xs text-text-secondary truncate">
-                {user?.phone_number || (user?.username ? `@${user.username}` : 'Online')}
-              </p>
-            </div>
-          </div>
+      <aside className="hidden md:flex w-80 lg:w-[350px] flex-col border-r border-[#2C2D30]/80 bg-[#1B1C1D] shrink-0 h-full">
+        {/* Top Header: Chats title & actions matching exact Signal screenshot */}
+        <div className="flex items-center justify-between px-5 pt-4 pb-2">
+          <h1 className="text-[22px] font-bold text-white tracking-tight">Chats</h1>
+          <div className="flex items-center gap-1">
+            {/* Compose / New Chat button */}
+            <button
+              id="new-chat-modal-btn"
+              onClick={() => setIsNewChatModalOpen(true)}
+              title="New chat"
+              className="p-2 text-[#A0A2A8] hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-[18px] h-[18px]"
+              >
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+            </button>
 
-          <div className="flex items-center gap-1 shrink-0">
+            {/* New Group button */}
             <button
               id="new-group-modal-btn"
               onClick={() => setIsNewGroupModalOpen(true)}
               title="New Group"
-              className="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-panel transition-colors"
+              className="p-2 text-[#A0A2A8] hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -295,57 +309,41 @@ export default function ChatDetailPage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="w-4 h-4"
+                className="w-[18px] h-[18px]"
               >
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
             </button>
+
+            {/* More Menu */}
             <button
-              id="new-chat-modal-btn"
-              onClick={() => setIsNewChatModalOpen(true)}
-              title="New Conversation"
-              className="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-panel transition-colors"
+              title="More options"
+              className="p-2 text-[#A0A2A8] hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4"
-              >
-                <path d="M12 5v14M5 12h14" />
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <circle cx="12" cy="12" r="1" />
+                <circle cx="19" cy="12" r="1" />
+                <circle cx="5" cy="12" r="1" />
               </svg>
             </button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => logout()}
-              className="text-xs px-2.5 py-1"
-            >
-              Logout
-            </Button>
           </div>
         </div>
 
-        {/* Search */}
-        <div className="p-3 border-b border-neutral-800/50">
-          <div className="relative">
-            <Input
+        {/* Search Bar + Filter Button matching photo */}
+        <div className="px-4 pb-2.5 flex items-center gap-2">
+          <div className="relative flex-1">
+            <input
               type="text"
-              placeholder="Search conversations..."
+              placeholder={unreadOnly ? 'Search unread chats' : 'Search'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 bg-bg-panel/70 text-xs py-1.5"
+              className="w-full bg-[#2C2D30] text-white text-[14px] rounded-full pl-9 pr-3 py-1.5 placeholder-[#8E9096] focus:outline-none focus:ring-1 focus:ring-neutral-500 transition-all"
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none"
+              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E9096] pointer-events-none"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -355,23 +353,55 @@ export default function ChatDetailPage() {
               <path d="m21 21-4.3-4.3" />
             </svg>
           </div>
+
+          {/* Filter button (toggles unread only) */}
+          <button
+            onClick={() => setUnreadOnly((prev) => !prev)}
+            title={unreadOnly ? 'Clear unread filter' : 'Filter by unread'}
+            className={`p-1.5 rounded-full transition-all ${
+              unreadOnly
+                ? 'bg-signal-blue text-white shadow-md'
+                : 'text-[#8E9096] hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="7" y1="12" x2="17" y2="12" />
+              <line x1="10" y1="18" x2="14" y2="18" />
+            </svg>
+          </button>
         </div>
 
-        {/* List Header */}
-        <div className="flex items-center justify-between px-4 pt-3 pb-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-            Chats
-          </span>
-          {totalUnread > 0 && (
-            <Badge variant="unread" count={totalUnread}>
-              {totalUnread} unread
-            </Badge>
+        {/* Filtered by unread indicator */}
+        {unreadOnly && (
+          <div className="px-5 py-1 text-[13px] text-[#8E9096]">
+            Filtered by unread
+          </div>
+        )}
+
+        {/* Scrollable Conversations List */}
+        <div className="flex-1 overflow-y-auto px-1 py-1 space-y-0.5">
+          {/* Empty State when Filtered */}
+          {unreadOnly && displayedConversations.length === 0 && (
+            <div className="py-16 text-center px-4 flex flex-col items-center justify-center gap-3">
+              <p className="text-[15px] font-medium text-white">No unread chats</p>
+              <button
+                onClick={() => setUnreadOnly(false)}
+                className="px-4 py-1.5 rounded-full bg-[#2C2D30] hover:bg-[#38393C] text-white text-[13px] font-medium transition-colors"
+              >
+                Clear filter
+              </button>
+            </div>
           )}
-        </div>
 
-        {/* Conversations */}
-        <div className="flex-1 overflow-y-auto px-2 py-1 space-y-1">
-          {filteredConversations.map((conv) => {
+          {/* Empty State when search matches nothing */}
+          {!unreadOnly && displayedConversations.length === 0 && (
+            <div className="py-16 text-center text-[#8E9096] text-xs px-4">
+              {searchQuery ? 'No matching conversations found.' : 'No conversations yet.'}
+            </div>
+          )}
+
+          {displayedConversations.map((conv) => {
             const itemData: MockConversation = {
               id: conv.id,
               type: conv.type,

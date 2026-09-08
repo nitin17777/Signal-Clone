@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Avatar } from '@/components/ui/Avatar';
-import { Button } from '@/components/ui/Button';
 import { api, ConversationDetail, ConversationMember } from '@/lib/api';
 
 export interface GroupInfoPanelProps {
@@ -24,6 +23,7 @@ export const GroupInfoPanel: React.FC<GroupInfoPanelProps> = ({
 }) => {
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [disappearingOff, setDisappearingOff] = useState(true);
 
   const handleRemove = async (member: ConversationMember) => {
     if (!window.confirm(`Remove ${member.user?.display_name || `User ${member.user_id}`} from the group?`)) return;
@@ -44,179 +44,255 @@ export const GroupInfoPanel: React.FC<GroupInfoPanelProps> = ({
   return (
     <aside
       id="group-info-panel"
-      className="w-72 lg:w-80 flex flex-col border-l border-neutral-800/80 bg-bg-dark h-full shrink-0 animate-in slide-in-from-right duration-200"
+      className="w-full md:w-[380px] lg:w-[440px] flex flex-col border-l border-[#2C2D30]/80 bg-[#1F2022] h-full shrink-0 overflow-y-auto select-none animate-in slide-in-from-right duration-150"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3.5 border-b border-neutral-800/80">
-        <h2 className="text-sm font-semibold text-text-primary">Group Info</h2>
+      {/* Top Bar with Back Chevron */}
+      <div className="flex items-center px-4 pt-3 pb-1 shrink-0">
         <button
           onClick={onClose}
           id="close-group-info-btn"
-          className="p-1.5 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-panel transition-colors"
-          aria-label="Close group info"
+          className="p-1.5 -ml-1 text-[#A0A2A8] hover:text-white rounded-lg transition-colors"
+          aria-label="Back to chat"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="w-4 h-4"
+            className="w-5 h-5"
           >
-            <path d="M18 6 6 18M6 6l12 12" />
+            <path d="m15 18-6-6 6-6" />
           </svg>
         </button>
       </div>
 
-      {/* Group avatar + name */}
-      <div className="flex flex-col items-center gap-3 py-6 px-4 border-b border-neutral-800/60">
-        <div className="relative">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent-blue/60 to-purple-500/60 flex items-center justify-center border-2 border-neutral-700">
-            {conversation.avatar_url ? (
-              <img
-                src={conversation.avatar_url}
-                alt={conversation.name || 'Group'}
-                className="w-full h-full rounded-full object-cover"
-              />
-            ) : (
-              <span className="text-2xl font-bold text-white select-none">
-                {(conversation.name || 'G').slice(0, 2).toUpperCase()}
-              </span>
-            )}
-          </div>
-          {/* Group icon badge */}
-          <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-bg-panel border border-neutral-700 flex items-center justify-center">
+      {/* Group avatar + name + description */}
+      <div className="flex flex-col items-center px-6 pt-2 pb-5 text-center">
+        {/* Large White Avatar with Group Icon */}
+        <div className="w-24 h-24 rounded-full bg-white text-[#58595B] flex items-center justify-center shadow-lg mb-3">
+          {conversation.avatar_url ? (
+            <img
+              src={conversation.avatar_url}
+              alt={conversation.name || 'Group'}
+              className="w-full h-full rounded-full object-cover"
+            />
+          ) : (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
+              stroke="#58595B"
+              strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="w-3.5 h-3.5 text-text-secondary"
+              className="w-12 h-12"
             >
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
-          </span>
+          )}
         </div>
 
-        <div className="text-center">
-          <p className="text-base font-semibold text-text-primary">
-            {conversation.name || 'Group'}
-          </p>
-          <p className="text-xs text-text-secondary mt-0.5">
-            {memberCount} member{memberCount !== 1 ? 's' : ''}
-          </p>
+        {/* Group Name */}
+        <h2 className="text-[22px] font-bold text-white tracking-tight leading-tight mb-1">
+          {conversation.name || 'Group'}
+        </h2>
+
+        {/* Group description */}
+        <button className="text-[13px] text-[#8E9096] hover:text-white transition-colors cursor-pointer">
+          Add group description...
+        </button>
+
+        {/* Action Buttons: Video, Mute, Search */}
+        <div className="flex items-center justify-center gap-6 mt-5">
+          {/* Video */}
+          <div className="flex flex-col items-center gap-1.5">
+            <button
+              title="Video Call"
+              className="w-11 h-11 rounded-full bg-[#343538] hover:bg-[#404145] text-white flex items-center justify-center transition-all active:scale-95"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <polygon points="23 7 16 12 23 17 23 7" />
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+              </svg>
+            </button>
+            <span className="text-[11px] text-[#A0A2A8]">Video</span>
+          </div>
+
+          {/* Mute */}
+          <div className="flex flex-col items-center gap-1.5">
+            <button
+              title="Mute Notifications"
+              className="w-11 h-11 rounded-full bg-[#343538] hover:bg-[#404145] text-white flex items-center justify-center transition-all active:scale-95"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              </svg>
+            </button>
+            <span className="text-[11px] text-[#A0A2A8]">Mute</span>
+          </div>
+
+          {/* Search */}
+          <div className="flex flex-col items-center gap-1.5">
+            <button
+              title="Search"
+              className="w-11 h-11 rounded-full bg-[#343538] hover:bg-[#404145] text-white flex items-center justify-center transition-all active:scale-95"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
+            <span className="text-[11px] text-[#A0A2A8]">Search</span>
+          </div>
         </div>
       </div>
 
-      {/* Members list */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="px-4 pt-3 pb-1">
-          <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-            Members
-          </p>
+      <div className="h-[1px] bg-[#2C2D30] mx-4" />
+
+      {/* Settings Options List */}
+      <div className="px-4 py-3 space-y-1">
+        {/* Disappearing messages */}
+        <div className="flex items-start justify-between py-2.5 px-2 hover:bg-white/5 rounded-xl transition-colors cursor-pointer">
+          <div className="flex items-start gap-3.5 pr-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#A0A2A8] mt-0.5 shrink-0">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <div>
+              <p className="text-[14px] font-medium text-white">Disappearing messages</p>
+              <p className="text-[11px] text-[#8E9096] leading-relaxed mt-0.5">
+                When enabled, messages sent and received in this group will disappear after they&apos;ve been seen.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setDisappearingOff((p) => !p)}
+            className="flex items-center gap-1 text-[12px] bg-[#2C2D30] text-white px-2.5 py-1 rounded-md shrink-0 hover:bg-[#38393C] transition-colors"
+          >
+            <span>{disappearingOff ? 'Off' : '1 day'}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
         </div>
 
+        {/* Chat color */}
+        <div className="flex items-center justify-between py-2.5 px-2 hover:bg-white/5 rounded-xl transition-colors cursor-pointer">
+          <div className="flex items-center gap-3.5">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#A0A2A8] shrink-0">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 2a10 10 0 0 1 10 10" />
+            </svg>
+            <p className="text-[14px] font-medium text-white">Chat color</p>
+          </div>
+          <span className="w-4 h-4 rounded-full bg-signal-blue shadow-sm shrink-0" />
+        </div>
+
+        {/* Notifications */}
+        <div className="flex items-center justify-between py-2.5 px-2 hover:bg-white/5 rounded-xl transition-colors cursor-pointer">
+          <div className="flex items-center gap-3.5">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#A0A2A8] shrink-0">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </svg>
+            <p className="text-[14px] font-medium text-white">Notifications</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="h-[1px] bg-[#2C2D30] mx-4" />
+
+      {/* Members Section */}
+      <div className="px-4 py-3">
+        <div className="flex items-center justify-between py-2 px-2">
+          <span className="text-[14px] font-bold text-white">
+            {memberCount} member{memberCount !== 1 ? 's' : ''}
+          </span>
+          <button title="Search members" className="p-1 text-[#A0A2A8] hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </button>
+        </div>
+
+        {/* + Add members button */}
+        <button className="w-full flex items-center gap-3.5 py-2.5 px-2 hover:bg-white/5 rounded-xl transition-colors text-left text-white group">
+          <div className="w-9 h-9 rounded-full bg-[#343538] flex items-center justify-center text-white shrink-0 group-hover:bg-[#404145] transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </div>
+          <span className="text-[14px] font-medium">Add members</span>
+        </button>
+
         {error && (
-          <div className="mx-4 mb-2 text-xs text-red-400 bg-red-500/10 border border-red-500/30 rounded-panel px-3 py-2">
+          <div className="mt-2 text-xs text-red-400 bg-red-500/10 border border-red-500/30 rounded-panel px-3 py-2">
             {error}
           </div>
         )}
 
-        <ul className="px-2 pb-4 space-y-0.5">
+        {/* Members List */}
+        <div className="mt-1 space-y-1">
           {conversation.members.map((member) => {
-            const name =
-              member.user?.display_name ||
-              member.user?.username ||
-              `User ${member.user_id}`;
             const isMe = member.user_id === currentUserId;
+            const name = isMe
+              ? 'You'
+              : member.user?.display_name || member.user?.username || `User ${member.user_id}`;
+            const isAdmin = member.role === 'admin' || isMe;
             const isRemoving = removingId === member.user_id;
             const canRemove = currentUserRole === 'admin' && !isMe;
 
             return (
-              <li
-                key={member.user_id}
-                className="flex items-center gap-3 px-2 py-2.5 rounded-panel hover:bg-bg-panel/50 transition-colors group"
+              <div
+                key={member.id || member.user_id}
+                className="flex items-center justify-between py-2 px-2 hover:bg-white/5 rounded-xl transition-colors group"
               >
-                <Avatar
-                  name={name}
-                  src={member.user?.avatar_url}
-                  size="sm"
-                  isOnline={member.user?.is_online}
-                />
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm text-text-primary truncate">
-                      {name}
-                    </span>
-                    {isMe && (
-                      <span className="text-[10px] text-text-secondary shrink-0">
-                        (you)
-                      </span>
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-white text-[#58595B] flex items-center justify-center shrink-0 font-semibold text-xs">
+                    {member.user?.avatar_url ? (
+                      <img src={member.user.avatar_url} alt={name} className="w-full h-full rounded-full object-cover" />
+                    ) : (
+                      name.slice(0, 2).toUpperCase()
                     )}
                   </div>
-                  {/* Role badge */}
-                  <span
-                    className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded mt-0.5 ${
-                      member.role === 'admin'
-                        ? 'bg-accent-blue/15 text-accent-blue'
-                        : 'bg-neutral-800 text-text-secondary'
-                    }`}
-                  >
-                    {member.role}
-                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-medium text-white truncate">{name}</p>
+                    {isMe && (
+                      <p className="text-[11px] text-[#8E9096] hover:text-white cursor-pointer truncate">
+                        Add member label &gt;
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                {/* Remove button — admin only, not self */}
-                {canRemove && (
-                  <button
-                    id={`remove-member-${member.user_id}`}
-                    onClick={() => handleRemove(member)}
-                    disabled={isRemoving}
-                    title={`Remove ${name}`}
-                    className="p-1.5 rounded-full text-text-secondary hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-50"
-                    aria-label={`Remove ${name} from group`}
-                  >
-                    {isRemoving ? (
-                      <svg
-                        className="w-3.5 h-3.5 animate-spin"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="w-3.5 h-3.5"
-                      >
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6l-1 14H6L5 6" />
-                        <path d="M10 11v6M14 11v6" />
-                        <path d="M9 6V4h6v2" />
-                      </svg>
-                    )}
-                  </button>
-                )}
-              </li>
+                <div className="flex items-center gap-2">
+                  {isAdmin && (
+                    <span className="text-[11px] text-[#8E9096] font-normal">Admin</span>
+                  )}
+                  {canRemove && (
+                    <button
+                      onClick={() => handleRemove(member)}
+                      disabled={isRemoving}
+                      title="Remove from group"
+                      className="text-xs text-red-400 hover:text-red-300 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      {isRemoving ? '...' : 'Remove'}
+                    </button>
+                  )}
+                </div>
+              </div>
             );
           })}
-        </ul>
+        </div>
       </div>
     </aside>
   );
