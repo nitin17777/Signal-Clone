@@ -156,7 +156,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       {/* Floating Action Pill on Hover */}
       {showActions && !isDeleted && (
         <div
-          className={`absolute top-[-26px] z-10 flex items-center gap-1 bg-[var(--bg-card)] backdrop-blur-md border border-[var(--border-subtle)] rounded-full px-2 py-1 shadow-lg animate-in fade-in zoom-in-95 duration-100 ${
+          className={`absolute top-[-26px] z-10 flex items-center gap-1 bg-[#242528]/95 backdrop-blur-md border border-neutral-700/70 rounded-full px-2 py-1 shadow-lg animate-in fade-in zoom-in-95 duration-100 ${
             isSent ? 'right-4' : 'left-4'
           }`}
         >
@@ -172,7 +172,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             </button>
           ))}
 
-          <div className="w-[1px] h-3 bg-[var(--border-subtle)] mx-0.5" />
+          <div className="w-[1px] h-3 bg-neutral-700 mx-0.5" />
 
           {/* Reply */}
           {onReply && content && (
@@ -213,8 +213,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         <div
           className={`relative px-3.5 py-2 shadow-sm transition-all duration-100 ${
             isSent
-              ? 'bg-[var(--bubble-sent)] text-white rounded-[18px] rounded-br-[4px]'
-              : 'bg-[var(--bubble-received)] text-[var(--text-primary)] rounded-[18px] rounded-bl-[4px] border border-[var(--border-subtle)]'
+              ? 'bg-[#2C6BED] text-white rounded-[18px] rounded-br-[4px]'
+              : 'bg-[#2E2E30] text-[#F2F2F2] rounded-[18px] rounded-bl-[4px] border border-neutral-700/40'
           }`}
         >
           {/* Sender name for received group messages */}
@@ -254,7 +254,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         {reaction && (
           <div
             onClick={() => handleReactionClick(reaction)}
-            className={`absolute -bottom-2 cursor-pointer bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-full px-1.5 py-0.5 text-xs shadow-md hover:scale-110 transition-transform ${
+            className={`absolute -bottom-2 cursor-pointer bg-[#202124] border border-neutral-700/80 rounded-full px-1.5 py-0.5 text-xs shadow-md hover:scale-110 transition-transform ${
               isSent ? 'right-2' : 'left-2'
             }`}
           >

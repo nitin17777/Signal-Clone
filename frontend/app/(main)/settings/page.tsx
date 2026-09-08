@@ -56,12 +56,7 @@ export default function SettingsPage() {
       document.documentElement.classList.add('dark');
     } else {
       setThemeMode('system');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (prefersDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      document.documentElement.classList.add('dark');
     }
   }, []);
 
@@ -74,13 +69,8 @@ export default function SettingsPage() {
       document.documentElement.classList.add('dark');
       localStorage.setItem('signal-theme', 'dark');
     } else {
+      document.documentElement.classList.add('dark');
       localStorage.setItem('signal-theme', 'system');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (prefersDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
     }
   };
 
@@ -121,7 +111,7 @@ export default function SettingsPage() {
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
           <circle cx="12" cy="12" r="10" />
-          <path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor" fillOpacity="0.6" />
+          <path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor" fillOpacity="0.4" />
         </svg>
       ),
     },
@@ -195,12 +185,12 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="flex h-screen w-full bg-[var(--bg-main)] text-[var(--text-primary)] overflow-hidden transition-colors">
+    <div className="flex h-screen w-full bg-[#121214] text-white overflow-hidden">
       {/* ---------------- Left Sidebar: Settings Navigation ---------------- */}
-      <aside className="w-full md:w-80 lg:w-[320px] flex flex-col border-r border-[var(--border-subtle)] bg-[var(--bg-sidebar)] shrink-0 h-full select-none transition-colors">
+      <aside className="w-full md:w-80 lg:w-[320px] flex flex-col border-r border-[#28282B] bg-[#18181A] shrink-0 h-full select-none">
         {/* Settings Header */}
         <div className="px-5 pt-4 pb-3">
-          <h1 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight">Settings</h1>
+          <h1 className="text-[22px] font-bold text-white tracking-tight">Settings</h1>
         </div>
 
         {/* User Profile Card Item */}
@@ -209,19 +199,19 @@ export default function SettingsPage() {
             onClick={() => setActiveTab('profile')}
             className={`w-full text-left flex items-center gap-3.5 px-3 py-3 rounded-[14px] transition-all duration-150 ${
               activeTab === 'profile'
-                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold shadow-sm'
-                : 'hover:bg-[var(--bg-hover)] text-[var(--text-primary)]'
+                ? 'bg-[#323336] text-white shadow-sm'
+                : 'hover:bg-[#232426] text-white'
             }`}
           >
-            {/* Circle avatar */}
-            <div className="w-11 h-11 rounded-full bg-[var(--avatar-bg)] text-[var(--avatar-text)] flex items-center justify-center font-bold text-[17px] shrink-0 shadow-sm">
+            {/* White circle avatar matching screenshot */}
+            <div className="w-11 h-11 rounded-full bg-[#E5E6E8] text-[#18181A] flex items-center justify-center font-bold text-[17px] shrink-0 shadow-sm">
               {user?.display_name?.charAt(0).toUpperCase() || 'N'}
             </div>
             <div className="min-w-0 flex-1">
-              <span className="text-[15px] font-semibold text-[var(--text-primary)] block truncate leading-tight">
+              <span className="text-[15px] font-semibold text-white block truncate leading-tight">
                 {user?.display_name || 'Nitin'}
               </span>
-              <p className="text-[12px] text-[var(--text-secondary)] truncate mt-0.5">
+              <p className="text-[12px] text-[#9E9E9E] truncate mt-0.5">
                 {user?.phone_number || (user?.username ? `@${user.username}` : '091190 91688')}
               </p>
             </div>
@@ -238,11 +228,11 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-[12px] text-[14px] font-medium transition-all duration-150 ${
                   isActive
-                    ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold shadow-sm'
-                    : 'text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+                    ? 'bg-[#323336] text-white shadow-sm'
+                    : 'text-white hover:bg-[#232426]'
                 }`}
               >
-                <span className={`${isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
+                <span className={`${isActive ? 'text-white' : 'text-[#9E9E9E]'}`}>
                   {item.icon}
                 </span>
                 <span>{item.label}</span>
@@ -253,29 +243,29 @@ export default function SettingsPage() {
       </aside>
 
       {/* ---------------- Right Content View (Matching Screenshot Card Style) ---------------- */}
-      <main className="flex-1 h-full overflow-y-auto bg-[var(--bg-main)] px-6 md:px-12 py-8 select-none transition-colors">
+      <main className="flex-1 h-full overflow-y-auto bg-[#121214] px-6 md:px-12 py-8 select-none">
         <div className="max-w-xl mx-auto">
           {/* ================= APPEARANCE VIEW (Exact Match to User Screenshot) ================= */}
           {activeTab === 'appearance' && (
             <div className="animate-in fade-in duration-150">
               {/* Centered Header */}
-              <h2 className="text-[17px] font-semibold text-[var(--text-primary)] mb-6 text-center">Appearance</h2>
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Appearance</h2>
 
               {/* Floating Settings Card */}
-              <div className="rounded-[18px] bg-[var(--bg-card)] border border-[var(--border-subtle)] p-5 space-y-5 shadow-sm transition-colors">
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 {/* Language Row */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[var(--text-secondary)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[#9E9E9E]">
                       <circle cx="12" cy="12" r="10" />
                       <line x1="2" y1="12" x2="22" y2="12" />
                       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                     </svg>
-                    <span className="text-[14px] text-[var(--text-primary)] font-normal">Language</span>
+                    <span className="text-[14px] text-white font-normal">Language</span>
                   </div>
                   <button
                     onClick={() => alert('Language options: English (default)')}
-                    className="flex items-center gap-1 text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                    className="flex items-center gap-1 text-[13px] text-[#9E9E9E] hover:text-white transition-colors"
                   >
                     <span>{language}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
@@ -287,23 +277,23 @@ export default function SettingsPage() {
                 {/* Theme Row */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[var(--text-secondary)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[#9E9E9E]">
                       <circle cx="12" cy="12" r="10" />
                       <path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor" fillOpacity="0.6" />
                     </svg>
-                    <span className="text-[14px] text-[var(--text-primary)] font-normal">Theme</span>
+                    <span className="text-[14px] text-white font-normal">Theme</span>
                   </div>
                   <div className="relative">
                     <select
                       value={themeMode}
                       onChange={(e) => handleThemeChange(e.target.value as any)}
-                      className="appearance-none bg-[var(--bg-pill)] text-[var(--text-primary)] text-[13px] font-medium px-4 py-1.5 pr-8 rounded-lg focus:outline-none cursor-pointer transition-colors"
+                      className="appearance-none bg-[#2C2D30] hover:bg-[#36373A] text-white text-[13px] font-medium px-4 py-1.5 pr-8 rounded-lg focus:outline-none cursor-pointer transition-colors"
                     >
                       <option value="system">System</option>
                       <option value="dark">Dark</option>
                       <option value="light">Light</option>
                     </select>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[var(--text-secondary)] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[#9E9E9E] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
                       <polyline points="6 9 12 15 18 9" />
                     </svg>
                   </div>
@@ -312,14 +302,14 @@ export default function SettingsPage() {
                 {/* Chat color Row */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[var(--text-secondary)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[#9E9E9E]">
                       <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
                       <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
                       <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
                       <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
                       <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
                     </svg>
-                    <span className="text-[14px] text-[var(--text-primary)] font-normal">Chat color</span>
+                    <span className="text-[14px] text-white font-normal">Chat color</span>
                   </div>
                   <div className="w-4 h-4 rounded-full bg-signal-blue ring-2 ring-white/10" />
                 </div>
@@ -327,17 +317,17 @@ export default function SettingsPage() {
                 {/* Zoom level Row */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[var(--text-secondary)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-[#9E9E9E]">
                       <circle cx="11" cy="11" r="8" />
                       <line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
-                    <span className="text-[14px] text-[var(--text-primary)] font-normal">Zoom level</span>
+                    <span className="text-[14px] text-white font-normal">Zoom level</span>
                   </div>
                   <div className="relative">
                     <select
                       value={zoomLevel}
                       onChange={(e) => setZoomLevel(e.target.value)}
-                      className="appearance-none bg-[var(--bg-pill)] text-[var(--text-primary)] text-[13px] font-medium px-4 py-1.5 pr-8 rounded-lg focus:outline-none cursor-pointer transition-colors"
+                      className="appearance-none bg-[#2C2D30] hover:bg-[#36373A] text-white text-[13px] font-medium px-4 py-1.5 pr-8 rounded-lg focus:outline-none cursor-pointer transition-colors"
                     >
                       <option value="80%">80%</option>
                       <option value="90%">90%</option>
@@ -345,7 +335,7 @@ export default function SettingsPage() {
                       <option value="110%">110%</option>
                       <option value="125%">125%</option>
                     </select>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[var(--text-secondary)] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[#9E9E9E] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
                       <polyline points="6 9 12 15 18 9" />
                     </svg>
                   </div>
@@ -357,11 +347,11 @@ export default function SettingsPage() {
           {/* ================= PROFILE VIEW ================= */}
           {activeTab === 'profile' && (
             <div className="flex flex-col items-center animate-in fade-in duration-150">
-              <h2 className="text-[17px] font-semibold text-[var(--text-primary)] mb-6 text-center">Profile</h2>
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Profile</h2>
 
-              {/* Large Avatar Circle */}
+              {/* Large White Avatar Circle */}
               <div className="relative mb-2">
-                <div className="w-24 h-24 rounded-full bg-[var(--avatar-bg)] text-[var(--avatar-text)] flex items-center justify-center font-bold text-3xl shadow-md select-none">
+                <div className="w-24 h-24 rounded-full bg-[#E5E6E8] text-[#18181A] flex items-center justify-center font-bold text-3xl shadow-md select-none">
                   {displayName?.charAt(0).toUpperCase() || 'N'}
                 </div>
               </div>
@@ -370,13 +360,13 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => alert('Photo upload dialog')}
-                className="px-3.5 py-1 rounded-full bg-[var(--bg-pill)] hover:bg-[var(--bg-active)] text-[12px] font-medium text-[var(--text-primary)] transition-colors mb-8 active:scale-95"
+                className="px-3.5 py-1 rounded-full bg-[#2C2D30] hover:bg-[#38393C] text-[12px] font-medium text-white transition-colors mb-8 active:scale-95"
               >
                 Edit photo
               </button>
 
               {profileSuccessMsg && (
-                <div className="w-full mb-4 p-2.5 rounded-lg bg-green-500/10 border border-green-500/30 text-green-500 text-xs text-center">
+                <div className="w-full mb-4 p-2.5 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-xs text-center">
                   {profileSuccessMsg}
                 </div>
               )}
@@ -385,7 +375,7 @@ export default function SettingsPage() {
               <div className="w-full space-y-6 text-left">
                 {/* Display Name Row */}
                 <div className="flex items-start gap-3.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[var(--text-secondary)] mt-1 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#9E9E9E] mt-1 shrink-0">
                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                   </svg>
@@ -397,7 +387,7 @@ export default function SettingsPage() {
                           value={displayName}
                           onChange={(e) => setDisplayName(e.target.value)}
                           placeholder="Your Name"
-                          className="flex-1 bg-[var(--bg-pill)] text-[var(--text-primary)] text-[14px] px-3 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-signal-blue"
+                          className="flex-1 bg-[#2C2D30] text-white text-[14px] px-3 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-signal-blue"
                           autoFocus
                         />
                         <button
@@ -413,8 +403,8 @@ export default function SettingsPage() {
                         onClick={() => setIsEditingName(true)}
                         className="group flex items-center justify-between cursor-pointer py-0.5"
                       >
-                        <span className="text-[15px] font-medium text-[var(--text-primary)]">{displayName || 'Nitin'}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                        <span className="text-[15px] font-medium text-white">{displayName || 'Nitin'}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#9E9E9E] group-hover:text-white transition-colors">
                           <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                         </svg>
                       </div>
@@ -424,7 +414,7 @@ export default function SettingsPage() {
 
                 {/* About / Status Row */}
                 <div className="flex items-start gap-3.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[var(--text-secondary)] mt-1 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#9E9E9E] mt-1 shrink-0">
                     <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                   </svg>
                   <div className="flex-1 min-w-0">
@@ -435,7 +425,7 @@ export default function SettingsPage() {
                           value={statusMessage}
                           onChange={(e) => setStatusMessage(e.target.value)}
                           placeholder="About..."
-                          className="flex-1 bg-[var(--bg-pill)] text-[var(--text-primary)] text-[14px] px-3 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-signal-blue"
+                          className="flex-1 bg-[#2C2D30] text-white text-[14px] px-3 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-signal-blue"
                           autoFocus
                         />
                         <button
@@ -451,32 +441,32 @@ export default function SettingsPage() {
                         onClick={() => setIsEditingAbout(true)}
                         className="group flex items-center justify-between cursor-pointer py-0.5"
                       >
-                        <span className="text-[14px] text-[var(--text-primary)]">{statusMessage || 'About'}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                        <span className="text-[14px] text-white">{statusMessage || 'About'}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#9E9E9E] group-hover:text-white transition-colors">
                           <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                         </svg>
                       </div>
                     )}
-                    <p className="text-[12px] text-[var(--text-secondary)] mt-2 leading-relaxed">
+                    <p className="text-[12px] text-[#9E9E9E] mt-2 leading-relaxed">
                       Your profile and changes to it will be visible to people you message, contacts and groups.
                     </p>
                   </div>
                 </div>
 
-                <div className="border-t border-[var(--border-subtle)] pt-6">
+                <div className="border-t border-[#28282B] pt-6">
                   {/* Username Row */}
                   <div className="flex items-start gap-3.5">
-                    <span className="text-[18px] text-[var(--text-secondary)] font-bold mt-0.5 shrink-0 select-none">@</span>
+                    <span className="text-[18px] text-[#9E9E9E] font-bold mt-0.5 shrink-0 select-none">@</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between py-0.5 cursor-pointer group">
-                        <span className="text-[14px] text-[var(--text-primary)]">
+                        <span className="text-[14px] text-white">
                           {user?.username ? `@${user.username}` : 'Username'}
                         </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#9E9E9E] group-hover:text-white transition-colors">
                           <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                         </svg>
                       </div>
-                      <p className="text-[12px] text-[var(--text-secondary)] mt-2 leading-relaxed">
+                      <p className="text-[12px] text-[#9E9E9E] mt-2 leading-relaxed">
                         People can now message you using your optional username so you don&apos;t have to give out your phone number.
                       </p>
                     </div>
@@ -489,21 +479,21 @@ export default function SettingsPage() {
           {/* ================= GENERAL VIEW ================= */}
           {activeTab === 'general' && (
             <div className="animate-in fade-in duration-150">
-              <h2 className="text-[17px] font-semibold text-[var(--text-primary)] mb-6 text-center">General</h2>
-              <div className="rounded-[18px] bg-[var(--bg-card)] border border-[var(--border-subtle)] p-5 space-y-5 shadow-sm transition-colors">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">General</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] text-[var(--text-primary)]">System Startup</span>
+                  <span className="text-[14px] text-white">System Startup</span>
                   <input type="checkbox" defaultChecked className="accent-signal-blue w-4 h-4 cursor-pointer" />
                 </div>
-                <div className="flex items-center justify-between pt-3 border-t border-[var(--border-subtle)]">
-                  <span className="text-[14px] text-[var(--text-primary)]">App Version</span>
-                  <span className="text-[13px] text-[var(--text-secondary)]">Signal Desktop v7.0.0</span>
+                <div className="flex items-center justify-between pt-3 border-t border-[#28282B]">
+                  <span className="text-[14px] text-white">App Version</span>
+                  <span className="text-[13px] text-[#9E9E9E]">Signal Desktop v7.0.0</span>
                 </div>
-                <div className="flex items-center justify-between pt-3 border-t border-[var(--border-subtle)]">
-                  <span className="text-[14px] text-red-500 font-medium">Sign Out</span>
+                <div className="flex items-center justify-between pt-3 border-t border-[#28282B]">
+                  <span className="text-[14px] text-red-400 font-medium">Sign Out</span>
                   <button
                     onClick={() => logout()}
-                    className="px-3 py-1 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-500 text-xs font-semibold transition-colors"
+                    className="px-3 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-semibold transition-colors"
                   >
                     Log Out
                   </button>
@@ -515,10 +505,10 @@ export default function SettingsPage() {
           {/* ================= NOTIFICATIONS VIEW ================= */}
           {activeTab === 'notifications' && (
             <div className="animate-in fade-in duration-150">
-              <h2 className="text-[17px] font-semibold text-[var(--text-primary)] mb-6 text-center">Notifications</h2>
-              <div className="rounded-[18px] bg-[var(--bg-card)] border border-[var(--border-subtle)] p-5 space-y-5 shadow-sm transition-colors">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Notifications</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] text-[var(--text-primary)]">Sound Alerts</span>
+                  <span className="text-[14px] text-white">Sound Alerts</span>
                   <input
                     type="checkbox"
                     checked={soundNotifications}
@@ -526,8 +516,8 @@ export default function SettingsPage() {
                     className="accent-signal-blue w-4 h-4 cursor-pointer"
                   />
                 </div>
-                <div className="flex items-center justify-between pt-3 border-t border-[var(--border-subtle)]">
-                  <span className="text-[14px] text-[var(--text-primary)]">Show Message Previews</span>
+                <div className="flex items-center justify-between pt-3 border-t border-[#28282B]">
+                  <span className="text-[14px] text-white">Show Message Previews</span>
                   <input type="checkbox" defaultChecked className="accent-signal-blue w-4 h-4 cursor-pointer" />
                 </div>
               </div>
@@ -537,10 +527,10 @@ export default function SettingsPage() {
           {/* ================= PRIVACY VIEW ================= */}
           {activeTab === 'privacy' && (
             <div className="animate-in fade-in duration-150">
-              <h2 className="text-[17px] font-semibold text-[var(--text-primary)] mb-6 text-center">Privacy</h2>
-              <div className="rounded-[18px] bg-[var(--bg-card)] border border-[var(--border-subtle)] p-5 space-y-5 shadow-sm transition-colors">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Privacy</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] text-[var(--text-primary)]">Read Receipts</span>
+                  <span className="text-[14px] text-white">Read Receipts</span>
                   <input
                     type="checkbox"
                     checked={readReceipts}
@@ -548,8 +538,8 @@ export default function SettingsPage() {
                     className="accent-signal-blue w-4 h-4 cursor-pointer"
                   />
                 </div>
-                <div className="flex items-center justify-between pt-3 border-t border-[var(--border-subtle)]">
-                  <span className="text-[14px] text-[var(--text-primary)]">Typing Indicators</span>
+                <div className="flex items-center justify-between pt-3 border-t border-[#28282B]">
+                  <span className="text-[14px] text-white">Typing Indicators</span>
                   <input
                     type="checkbox"
                     checked={typingIndicators}
@@ -564,10 +554,10 @@ export default function SettingsPage() {
           {/* ================= CHATS VIEW ================= */}
           {activeTab === 'chats' && (
             <div className="animate-in fade-in duration-150">
-              <h2 className="text-[17px] font-semibold text-[var(--text-primary)] mb-6 text-center">Chats</h2>
-              <div className="rounded-[18px] bg-[var(--bg-card)] border border-[var(--border-subtle)] p-5 space-y-5 shadow-sm transition-colors">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Chats</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] text-[var(--text-primary)]">Press Enter to Send</span>
+                  <span className="text-[14px] text-white">Press Enter to Send</span>
                   <input
                     type="checkbox"
                     checked={enterIsSend}
@@ -575,8 +565,8 @@ export default function SettingsPage() {
                     className="accent-signal-blue w-4 h-4 cursor-pointer"
                   />
                 </div>
-                <div className="flex items-center justify-between pt-3 border-t border-[var(--border-subtle)]">
-                  <span className="text-[14px] text-[var(--text-primary)]">Auto-Download Media</span>
+                <div className="flex items-center justify-between pt-3 border-t border-[#28282B]">
+                  <span className="text-[14px] text-white">Auto-Download Media</span>
                   <input type="checkbox" defaultChecked className="accent-signal-blue w-4 h-4 cursor-pointer" />
                 </div>
               </div>
@@ -586,10 +576,10 @@ export default function SettingsPage() {
           {/* ================= CALLS VIEW ================= */}
           {activeTab === 'calls' && (
             <div className="animate-in fade-in duration-150">
-              <h2 className="text-[17px] font-semibold text-[var(--text-primary)] mb-6 text-center">Calls</h2>
-              <div className="rounded-[18px] bg-[var(--bg-card)] border border-[var(--border-subtle)] p-5 space-y-5 shadow-sm transition-colors">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Calls</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] text-[var(--text-primary)]">Always Relay Calls</span>
+                  <span className="text-[14px] text-white">Always Relay Calls</span>
                   <input
                     type="checkbox"
                     checked={relayCalls}
@@ -604,15 +594,15 @@ export default function SettingsPage() {
           {/* ================= DATA USAGE VIEW ================= */}
           {activeTab === 'data-usage' && (
             <div className="animate-in fade-in duration-150">
-              <h2 className="text-[17px] font-semibold text-[var(--text-primary)] mb-6 text-center">Data usage</h2>
-              <div className="rounded-[18px] bg-[var(--bg-card)] border border-[var(--border-subtle)] p-5 space-y-4 shadow-sm transition-colors">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Data usage</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] text-[var(--text-primary)]">Sent Messages</span>
-                  <span className="text-[13px] text-[var(--text-secondary)]">24.8 KB</span>
+                  <span className="text-[14px] text-white">Sent Messages</span>
+                  <span className="text-[13px] text-[#9E9E9E]">24.8 KB</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] text-[var(--text-primary)]">Received Messages</span>
-                  <span className="text-[13px] text-[var(--text-secondary)]">51.2 KB</span>
+                  <span className="text-[14px] text-white">Received Messages</span>
+                  <span className="text-[13px] text-[#9E9E9E]">51.2 KB</span>
                 </div>
               </div>
             </div>
@@ -621,14 +611,14 @@ export default function SettingsPage() {
           {/* ================= BACKUPS VIEW ================= */}
           {activeTab === 'backups' && (
             <div className="animate-in fade-in duration-150">
-              <h2 className="text-[17px] font-semibold text-[var(--text-primary)] mb-6 text-center">Backups</h2>
-              <div className="rounded-[18px] bg-[var(--bg-card)] border border-[var(--border-subtle)] p-5 space-y-4 shadow-sm transition-colors">
-                <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">
+              <h2 className="text-[17px] font-semibold text-white mb-6 text-center">Backups</h2>
+              <div className="rounded-[18px] bg-[#1E1F22] border border-[#28282B] p-5 space-y-4 shadow-sm">
+                <p className="text-[13px] text-[#9E9E9E] leading-relaxed">
                   Backups are encrypted with a passphrase and saved locally to your device.
                 </p>
                 <button
                   onClick={() => alert('Backup created.')}
-                  className="px-4 py-2 rounded-lg bg-[var(--bg-pill)] hover:bg-[var(--bg-active)] text-xs font-semibold text-[var(--text-primary)] transition-colors"
+                  className="px-4 py-2 rounded-lg bg-[#2C2D30] hover:bg-[#36373A] text-xs font-semibold text-white transition-colors"
                 >
                   Create Backup
                 </button>
@@ -639,8 +629,8 @@ export default function SettingsPage() {
           {/* ================= DONATE VIEW ================= */}
           {activeTab === 'donate' && (
             <div className="animate-in fade-in duration-150 text-center">
-              <h2 className="text-[20px] font-bold text-[var(--text-primary)] mb-2">Donate to Signal</h2>
-              <p className="text-[13px] text-[var(--text-secondary)] max-w-sm mx-auto leading-relaxed mb-6">
+              <h2 className="text-[20px] font-bold text-white mb-2">Donate to Signal</h2>
+              <p className="text-[13px] text-[#9E9E9E] max-w-sm mx-auto leading-relaxed mb-6">
                 Signal is a non-profit dedicated to private, encrypted communication.
               </p>
               <div className="grid grid-cols-3 gap-3">
@@ -648,7 +638,7 @@ export default function SettingsPage() {
                   <button
                     key={tier}
                     onClick={() => alert(`Thank you for choosing ${tier} contribution!`)}
-                    className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-card)] hover:border-signal-blue text-[var(--text-primary)] font-semibold text-sm transition-all shadow-sm"
+                    className="p-3.5 rounded-xl border border-[#28282B] bg-[#1E1F22] hover:border-signal-blue text-white font-semibold text-sm transition-all"
                   >
                     {tier}
                   </button>

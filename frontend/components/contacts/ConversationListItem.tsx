@@ -60,8 +60,8 @@ export const ConversationListItem: React.FC<ConversationListItemProps> = ({
       }}
       className={`group relative flex items-center gap-3 px-3 py-2.5 mx-2 rounded-[12px] cursor-pointer select-none transition-all duration-150 ${
         isSelected
-          ? 'bg-[var(--bg-active)] text-[var(--text-primary)] shadow-sm'
-          : 'hover:bg-[var(--bg-hover)] text-[var(--text-primary)] active:scale-[0.99]'
+          ? 'bg-[#28282A] text-white shadow-sm'
+          : 'hover:bg-[#232426] text-text-primary active:scale-[0.99]'
       }`}
     >
       {/* Avatar with status indicator */}

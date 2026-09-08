@@ -44,14 +44,14 @@ export const GroupInfoPanel: React.FC<GroupInfoPanelProps> = ({
   return (
     <aside
       id="group-info-panel"
-      className="w-full md:w-[380px] lg:w-[440px] flex flex-col border-l border-[var(--border-subtle)] bg-[var(--bg-sidebar)] text-[var(--text-primary)] h-full shrink-0 overflow-y-auto select-none animate-in slide-in-from-right duration-150 transition-colors"
+      className="w-full md:w-[380px] lg:w-[440px] flex flex-col border-l border-[#2C2D30]/80 bg-[#1F2022] h-full shrink-0 overflow-y-auto select-none animate-in slide-in-from-right duration-150"
     >
       {/* Top Bar with Back Chevron */}
       <div className="flex items-center px-4 pt-3 pb-1 shrink-0">
         <button
           onClick={onClose}
           id="close-group-info-btn"
-          className="p-1.5 -ml-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg transition-colors"
+          className="p-1.5 -ml-1 text-[#A0A2A8] hover:text-white rounded-lg transition-colors"
           aria-label="Back to chat"
         >
           <svg
@@ -99,12 +99,12 @@ export const GroupInfoPanel: React.FC<GroupInfoPanelProps> = ({
         </div>
 
         {/* Group Name */}
-        <h2 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight leading-tight mb-1">
+        <h2 className="text-[22px] font-bold text-white tracking-tight leading-tight mb-1">
           {conversation.name || 'Group'}
         </h2>
 
         {/* Group description */}
-        <button className="text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer">
+        <button className="text-[13px] text-[#8E9096] hover:text-white transition-colors cursor-pointer">
           Add group description...
         </button>
 
@@ -114,67 +114,67 @@ export const GroupInfoPanel: React.FC<GroupInfoPanelProps> = ({
           <div className="flex flex-col items-center gap-1.5">
             <button
               title="Video Call"
-              className="w-11 h-11 rounded-full bg-[var(--bg-active)] hover:bg-[var(--bg-hover)] text-[var(--text-primary)] flex items-center justify-center transition-all active:scale-95"
+              className="w-11 h-11 rounded-full bg-[#343538] hover:bg-[#404145] text-white flex items-center justify-center transition-all active:scale-95"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                 <polygon points="23 7 16 12 23 17 23 7" />
                 <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
               </svg>
             </button>
-            <span className="text-[11px] text-[var(--text-secondary)]">Video</span>
+            <span className="text-[11px] text-[#A0A2A8]">Video</span>
           </div>
 
           {/* Mute */}
           <div className="flex flex-col items-center gap-1.5">
             <button
               title="Mute Notifications"
-              className="w-11 h-11 rounded-full bg-[var(--bg-active)] hover:bg-[var(--bg-hover)] text-[var(--text-primary)] flex items-center justify-center transition-all active:scale-95"
+              className="w-11 h-11 rounded-full bg-[#343538] hover:bg-[#404145] text-white flex items-center justify-center transition-all active:scale-95"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
               </svg>
             </button>
-            <span className="text-[11px] text-[var(--text-secondary)]">Mute</span>
+            <span className="text-[11px] text-[#A0A2A8]">Mute</span>
           </div>
 
           {/* Search */}
           <div className="flex flex-col items-center gap-1.5">
             <button
               title="Search"
-              className="w-11 h-11 rounded-full bg-[var(--bg-active)] hover:bg-[var(--bg-hover)] text-[var(--text-primary)] flex items-center justify-center transition-all active:scale-95"
+              className="w-11 h-11 rounded-full bg-[#343538] hover:bg-[#404145] text-white flex items-center justify-center transition-all active:scale-95"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </button>
-            <span className="text-[11px] text-[var(--text-secondary)]">Search</span>
+            <span className="text-[11px] text-[#A0A2A8]">Search</span>
           </div>
         </div>
       </div>
 
-      <div className="h-[1px] bg-[var(--border-subtle)] mx-4" />
+      <div className="h-[1px] bg-[#2C2D30] mx-4" />
 
       {/* Settings Options List */}
       <div className="px-4 py-3 space-y-1">
         {/* Disappearing messages */}
-        <div className="flex items-start justify-between py-2.5 px-2 hover:bg-[var(--bg-hover)] rounded-xl transition-colors cursor-pointer">
+        <div className="flex items-start justify-between py-2.5 px-2 hover:bg-white/5 rounded-xl transition-colors cursor-pointer">
           <div className="flex items-start gap-3.5 pr-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[var(--text-secondary)] mt-0.5 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#A0A2A8] mt-0.5 shrink-0">
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
             </svg>
             <div>
-              <p className="text-[14px] font-medium text-[var(--text-primary)]">Disappearing messages</p>
-              <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed mt-0.5">
+              <p className="text-[14px] font-medium text-white">Disappearing messages</p>
+              <p className="text-[11px] text-[#8E9096] leading-relaxed mt-0.5">
                 When enabled, messages sent and received in this group will disappear after they&apos;ve been seen.
               </p>
             </div>
           </div>
           <button
             onClick={() => setDisappearingOff((p) => !p)}
-            className="flex items-center gap-1 text-[12px] bg-[var(--bg-pill)] text-[var(--text-primary)] px-2.5 py-1 rounded-md shrink-0 hover:bg-[var(--bg-active)] transition-colors"
+            className="flex items-center gap-1 text-[12px] bg-[#2C2D30] text-white px-2.5 py-1 rounded-md shrink-0 hover:bg-[#38393C] transition-colors"
           >
             <span>{disappearingOff ? 'Off' : '1 day'}</span>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3">
@@ -184,38 +184,38 @@ export const GroupInfoPanel: React.FC<GroupInfoPanelProps> = ({
         </div>
 
         {/* Chat color */}
-        <div className="flex items-center justify-between py-2.5 px-2 hover:bg-[var(--bg-hover)] rounded-xl transition-colors cursor-pointer">
+        <div className="flex items-center justify-between py-2.5 px-2 hover:bg-white/5 rounded-xl transition-colors cursor-pointer">
           <div className="flex items-center gap-3.5">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[var(--text-secondary)] shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#A0A2A8] shrink-0">
               <circle cx="12" cy="12" r="10" />
               <path d="M12 2a10 10 0 0 1 10 10" />
             </svg>
-            <p className="text-[14px] font-medium text-[var(--text-primary)]">Chat color</p>
+            <p className="text-[14px] font-medium text-white">Chat color</p>
           </div>
           <span className="w-4 h-4 rounded-full bg-signal-blue shadow-sm shrink-0" />
         </div>
 
         {/* Notifications */}
-        <div className="flex items-center justify-between py-2.5 px-2 hover:bg-[var(--bg-hover)] rounded-xl transition-colors cursor-pointer">
+        <div className="flex items-center justify-between py-2.5 px-2 hover:bg-white/5 rounded-xl transition-colors cursor-pointer">
           <div className="flex items-center gap-3.5">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[var(--text-secondary)] shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#A0A2A8] shrink-0">
               <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
               <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
             </svg>
-            <p className="text-[14px] font-medium text-[var(--text-primary)]">Notifications</p>
+            <p className="text-[14px] font-medium text-white">Notifications</p>
           </div>
         </div>
       </div>
 
-      <div className="h-[1px] bg-[var(--border-subtle)] mx-4" />
+      <div className="h-[1px] bg-[#2C2D30] mx-4" />
 
       {/* Members Section */}
       <div className="px-4 py-3">
         <div className="flex items-center justify-between py-2 px-2">
-          <span className="text-[14px] font-bold text-[var(--text-primary)]">
+          <span className="text-[14px] font-bold text-white">
             {memberCount} member{memberCount !== 1 ? 's' : ''}
           </span>
-          <button title="Search members" className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+          <button title="Search members" className="p-1 text-[#A0A2A8] hover:text-white transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -224,8 +224,8 @@ export const GroupInfoPanel: React.FC<GroupInfoPanelProps> = ({
         </div>
 
         {/* + Add members button */}
-        <button className="w-full flex items-center gap-3.5 py-2.5 px-2 hover:bg-[var(--bg-hover)] rounded-xl transition-colors text-left text-[var(--text-primary)] group">
-          <div className="w-9 h-9 rounded-full bg-[var(--bg-active)] flex items-center justify-center text-[var(--text-primary)] shrink-0 group-hover:bg-[var(--bg-pill)] transition-colors">
+        <button className="w-full flex items-center gap-3.5 py-2.5 px-2 hover:bg-white/5 rounded-xl transition-colors text-left text-white group">
+          <div className="w-9 h-9 rounded-full bg-[#343538] flex items-center justify-center text-white shrink-0 group-hover:bg-[#404145] transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
@@ -254,10 +254,10 @@ export const GroupInfoPanel: React.FC<GroupInfoPanelProps> = ({
             return (
               <div
                 key={member.id || member.user_id}
-                className="flex items-center justify-between py-2 px-2 hover:bg-[var(--bg-hover)] rounded-xl transition-colors group"
+                className="flex items-center justify-between py-2 px-2 hover:bg-white/5 rounded-xl transition-colors group"
               >
                 <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-[var(--avatar-bg)] text-[var(--avatar-text)] flex items-center justify-center shrink-0 font-semibold text-xs">
+                  <div className="w-9 h-9 rounded-full bg-white text-[#58595B] flex items-center justify-center shrink-0 font-semibold text-xs">
                     {member.user?.avatar_url ? (
                       <img src={member.user.avatar_url} alt={name} className="w-full h-full rounded-full object-cover" />
                     ) : (
@@ -265,9 +265,9 @@ export const GroupInfoPanel: React.FC<GroupInfoPanelProps> = ({
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[14px] font-medium text-[var(--text-primary)] truncate">{name}</p>
+                    <p className="text-[14px] font-medium text-white truncate">{name}</p>
                     {isMe && (
-                      <p className="text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer truncate">
+                      <p className="text-[11px] text-[#8E9096] hover:text-white cursor-pointer truncate">
                         Add member label &gt;
                       </p>
                     )}
@@ -276,7 +276,7 @@ export const GroupInfoPanel: React.FC<GroupInfoPanelProps> = ({
 
                 <div className="flex items-center gap-2">
                   {isAdmin && (
-                    <span className="text-[11px] text-[var(--text-secondary)] font-normal">Admin</span>
+                    <span className="text-[11px] text-[#8E9096] font-normal">Admin</span>
                   )}
                   {canRemove && (
                     <button

@@ -38,7 +38,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const isGroup = type === 'group';
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-main)]/95 backdrop-blur-md shrink-0 select-none z-10 transition-colors">
+    <header className="flex items-center justify-between px-4 py-3 border-b border-border-subtle/80 bg-[#1B1C1D]/95 backdrop-blur-md shrink-0 select-none z-10">
       <div className="flex items-center gap-3 min-w-0">
         {/* Mobile Back Button */}
         {onBack && (

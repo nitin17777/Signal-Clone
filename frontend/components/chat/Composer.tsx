@@ -93,17 +93,17 @@ export const Composer: React.FC<ComposerProps> = ({
   const hasText = text.trim().length > 0;
 
   return (
-    <footer className="p-3 bg-[var(--bg-main)] border-t border-[var(--border-subtle)] shrink-0 select-none transition-colors">
+    <footer className="p-3 bg-[#1B1C1D] border-t border-border-subtle/80 shrink-0 select-none">
       <div className="relative flex items-end gap-2 max-w-4xl mx-auto">
         {/* Attachment menu popover */}
         {showAttachMenu && (
           <div
             ref={attachMenuRef}
-            className="absolute bottom-14 left-0 z-30 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-[14px] p-2 shadow-2xl flex flex-col gap-1 w-48 animate-in fade-in zoom-in-95 duration-100"
+            className="absolute bottom-14 left-0 z-30 bg-[#28282A] border border-neutral-700/80 rounded-[14px] p-2 shadow-2xl flex flex-col gap-1 w-48 animate-in fade-in zoom-in-95 duration-100"
           >
             <button
               onClick={() => { setShowAttachMenu(false); }}
-              className="flex items-center gap-3 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors text-left"
+              className="flex items-center gap-3 px-3 py-2 text-sm text-text-primary hover:bg-white/10 rounded-lg transition-colors text-left"
             >
               <span className="w-8 h-8 rounded-full bg-blue-500/20 text-signal-blue flex items-center justify-center">
                 🖼️
@@ -112,7 +112,7 @@ export const Composer: React.FC<ComposerProps> = ({
             </button>
             <button
               onClick={() => { setShowAttachMenu(false); }}
-              className="flex items-center gap-3 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors text-left"
+              className="flex items-center gap-3 px-3 py-2 text-sm text-text-primary hover:bg-white/10 rounded-lg transition-colors text-left"
             >
               <span className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center">
                 📁
@@ -121,7 +121,7 @@ export const Composer: React.FC<ComposerProps> = ({
             </button>
             <button
               onClick={() => { setShowAttachMenu(false); }}
-              className="flex items-center gap-3 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors text-left"
+              className="flex items-center gap-3 px-3 py-2 text-sm text-text-primary hover:bg-white/10 rounded-lg transition-colors text-left"
             >
               <span className="w-8 h-8 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center">
                 👤
@@ -137,7 +137,7 @@ export const Composer: React.FC<ComposerProps> = ({
           disabled={disabled}
           onClick={() => setShowAttachMenu((prev) => !prev)}
           title="Add attachment"
-          className="p-2.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full hover:bg-[var(--bg-hover)] transition-all duration-150 disabled:opacity-40 shrink-0 active:scale-95"
+          className="p-2.5 text-text-secondary hover:text-text-primary rounded-full hover:bg-bg-panel/80 transition-all duration-150 disabled:opacity-40 shrink-0 active:scale-95"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -155,7 +155,7 @@ export const Composer: React.FC<ComposerProps> = ({
         </button>
 
         {/* Text Input Pill */}
-        <div className="relative flex-1 min-w-0 rounded-[22px] bg-[var(--bg-pill)] border border-[var(--border-subtle)] focus-within:border-signal-blue focus-within:ring-1 focus-within:ring-signal-blue/40 transition-all px-4 py-2 flex items-center">
+        <div className="relative flex-1 min-w-0 rounded-[22px] bg-[#28282A] border border-neutral-700/60 focus-within:border-signal-blue focus-within:ring-1 focus-within:ring-signal-blue/40 transition-all px-4 py-2 flex items-center">
           <textarea
             ref={textareaRef}
             rows={1}
@@ -168,7 +168,7 @@ export const Composer: React.FC<ComposerProps> = ({
             onKeyDown={handleKeyDown}
             disabled={disabled}
             placeholder={placeholder}
-            className="w-full bg-transparent text-[15px] leading-[1.4] text-[var(--text-primary)] placeholder:[var(--text-secondary)] resize-none focus:outline-none max-h-32 overflow-y-auto"
+            className="w-full bg-transparent text-[15px] leading-[1.4] text-text-primary placeholder:text-text-secondary resize-none focus:outline-none max-h-32 overflow-y-auto"
           />
 
           {/* Emoji / Sticker Button */}
@@ -178,7 +178,7 @@ export const Composer: React.FC<ComposerProps> = ({
               disabled={disabled}
               onClick={() => setShowEmojiPicker((prev) => !prev)}
               title="Insert emoji"
-              className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors disabled:opacity-40 ml-1 shrink-0 active:scale-95"
+              className="p-1 text-text-secondary hover:text-text-primary transition-colors disabled:opacity-40 ml-1 shrink-0 active:scale-95"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -199,12 +199,12 @@ export const Composer: React.FC<ComposerProps> = ({
 
             {/* Quick Emoji Menu */}
             {showEmojiPicker && (
-              <div className="absolute bottom-10 right-0 z-30 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-[14px] p-2 shadow-2xl grid grid-cols-6 gap-2 w-64 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute bottom-10 right-0 z-30 bg-[#28282A] border border-neutral-700/80 rounded-[14px] p-2 shadow-2xl grid grid-cols-6 gap-2 w-64 animate-in fade-in zoom-in-95 duration-100">
                 {['😀', '😂', '😍', '🔥', '👍', '🙏', '🎉', '😎', '❤️', '🤔', '🥳', '✨', '👋', '💯', '🚀', '👀', '💡', '💪'].map((emoji) => (
                   <button
                     key={emoji}
                     onClick={() => insertEmoji(emoji)}
-                    className="text-lg hover:scale-125 hover:bg-[var(--bg-hover)] rounded-lg p-1 transition-transform"
+                    className="text-lg hover:scale-125 hover:bg-white/10 rounded-lg p-1 transition-transform"
                   >
                     {emoji}
                   </button>
@@ -237,9 +237,10 @@ export const Composer: React.FC<ComposerProps> = ({
             type="button"
             disabled={disabled}
             onClick={() => {
+              // Quick voice note placeholder
               onSend('🎤 [Voice Note - 0:04]');
             }}
-            className="shrink-0 rounded-full w-10 h-10 bg-[var(--bg-pill)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] flex items-center justify-center active:scale-95 transition-all duration-150"
+            className="shrink-0 rounded-full w-10 h-10 bg-[#28282A] text-text-secondary hover:text-text-primary hover:bg-neutral-700/60 flex items-center justify-center active:scale-95 transition-all duration-150"
             title="Record voice note"
           >
             <svg
