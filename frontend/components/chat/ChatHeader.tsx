@@ -38,7 +38,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const isGroup = type === 'group';
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 border-b border-neutral-800/80 bg-bg-dark/95 backdrop-blur-md shrink-0 select-none z-10">
+    <header className="flex items-center justify-between px-4 py-3 border-b border-border-subtle/80 bg-[#1B1C1D]/95 backdrop-blur-md shrink-0 select-none z-10">
       <div className="flex items-center gap-3 min-w-0">
         {/* Mobile Back Button */}
         {onBack && (
@@ -62,13 +62,13 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           </button>
         )}
 
-        {/* Clickable area for group info — wraps avatar + title */}
+        {/* Clickable area for profile info — wraps avatar + title */}
         <div
           id="chat-header-info-trigger"
           onClick={isGroup && onInfoClick ? onInfoClick : undefined}
           className={`flex items-center gap-3 min-w-0 ${
             isGroup && onInfoClick
-              ? 'cursor-pointer rounded-lg px-1 -mx-1 hover:bg-bg-panel/40 transition-colors'
+              ? 'cursor-pointer rounded-lg px-1 -mx-1 hover:bg-bg-panel/50 transition-colors'
               : ''
           }`}
           title={isGroup && onInfoClick ? 'View group info' : undefined}
@@ -116,30 +116,49 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       </div>
 
       {/* Right side actions */}
-      <div className="flex items-center gap-2">
-        {/* E2EE badge */}
-        <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-text-secondary bg-bg-panel px-2.5 py-1 rounded-full border border-neutral-800">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-3 h-3 text-online-green"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      <div className="flex items-center gap-1 sm:gap-2">
+        {/* Video Call */}
+        <button
+          type="button"
+          title="Start video call"
+          className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-panel/70 rounded-full transition-colors active:scale-95"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[19px] h-[19px]">
+            <polygon points="23 7 16 12 23 17 23 7" />
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
           </svg>
-          End-to-End Encrypted
-        </span>
+        </button>
 
-        {/* Group info button */}
+        {/* Voice Call */}
+        <button
+          type="button"
+          title="Start voice call"
+          className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-panel/70 rounded-full transition-colors active:scale-95"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[19px] h-[19px]">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.77 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+          </svg>
+        </button>
+
+        {/* Search inside chat */}
+        <button
+          type="button"
+          title="Search conversation"
+          className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-panel/70 rounded-full transition-colors active:scale-95"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[19px] h-[19px]">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
+
+        {/* Group info or More menu */}
         {isGroup && onInfoClick && (
           <button
             id="group-info-btn"
             onClick={onInfoClick}
             title="Group info"
-            className="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-panel transition-colors flex items-center justify-center"
+            className="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-panel/70 transition-colors flex items-center justify-center active:scale-95"
             aria-label="Open group info"
           >
             <svg

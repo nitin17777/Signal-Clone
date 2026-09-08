@@ -58,13 +58,13 @@ export const ConversationListItem: React.FC<ConversationListItemProps> = ({
           onClick?.();
         }
       }}
-      className={`group flex items-center gap-3 px-3.5 py-3 rounded-panel cursor-pointer select-none transition-all duration-150 ${
+      className={`group relative flex items-center gap-3 px-3 py-2.5 mx-2 rounded-[12px] cursor-pointer select-none transition-all duration-150 ${
         isSelected
-          ? 'bg-bg-panel border border-neutral-700/60 shadow-sm'
-          : 'hover:bg-bg-panel/60 border border-transparent active:bg-bg-panel/80'
+          ? 'bg-[#28282A] text-white shadow-sm'
+          : 'hover:bg-[#232426] text-text-primary active:scale-[0.99]'
       }`}
     >
-      {/* Avatar */}
+      {/* Avatar with status indicator */}
       <Avatar
         name={conversation.name}
         src={conversation.avatar_url}
@@ -77,14 +77,14 @@ export const ConversationListItem: React.FC<ConversationListItemProps> = ({
       <div className="flex-1 min-w-0">
         {/* Name + Timestamp */}
         <div className="flex items-center justify-between gap-1">
-          <span className="text-sm font-semibold text-text-primary truncate">
+          <span className="text-[14px] font-semibold text-text-primary truncate">
             {conversation.name}
           </span>
           {timeStr && (
             <span
-              className={`text-xs shrink-0 ${
+              className={`text-[11px] shrink-0 font-normal ${
                 conversation.unread_count > 0
-                  ? 'text-accent-blue font-medium'
+                  ? 'text-signal-blue font-medium'
                   : 'text-text-secondary'
               }`}
             >
@@ -106,11 +106,9 @@ export const ConversationListItem: React.FC<ConversationListItemProps> = ({
           </p>
 
           {conversation.unread_count > 0 && (
-            <Badge
-              count={conversation.unread_count}
-              variant="unread"
-              className="shrink-0 animate-in fade-in zoom-in duration-200"
-            />
+            <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 text-[10px] font-bold rounded-full bg-signal-blue text-white shadow-sm shrink-0">
+              {conversation.unread_count}
+            </span>
           )}
         </div>
       </div>
